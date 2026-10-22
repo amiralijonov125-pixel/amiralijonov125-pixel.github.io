@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-T+YPk+AsD7t/h+rF3tmjCkT4lJBBCW1qldxNv9f88PI=' 'sha256-zGksMWxpmmgH/Z5byOHfoXnU5ji2b48JlMLudIQLHvE=' 'sha256-9KlGBtqwsNGeTYmR4oDTNUU8tPMIQmwsRtH0ESN0GBk=' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://www.gstatic.com https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://*.googleusercontent.com; connect-src 'self' https://*.googleapis.com https://apis.google.com; media-src 'self' blob: data:; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src https://*.firebaseapp.com https://*.web.app https://accounts.google.com https://apis.google.com; manifest-src 'self'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-T+YPk+AsD7t/h+rF3tmjCkT4lJBBCW1qldxNv9f88PI=' 'sha256-CucOcIdlQegln42RK7SMxWc0QZgRi3M55d+jnX6ovRM=' 'sha256-9KlGBtqwsNGeTYmR4oDTNUU8tPMIQmwsRtH0ESN0GBk=' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://www.gstatic.com https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://*.googleusercontent.com https://www.google.com; connect-src 'self' https://*.googleapis.com https://apis.google.com; media-src 'self' blob: data:; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src https://*.firebaseapp.com https://*.web.app https://accounts.google.com https://apis.google.com; manifest-src 'self'; upgrade-insecure-requests">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="Китобхона — университетская онлайн-библиотека: книги, эссе и стихи преподавателей с проверкой оригинальности и ИИ-помощником.">
 <meta name="theme-color" content="#0d0907">
@@ -1036,6 +1036,9 @@ body[data-skin="parchment"] .role-pick input:checked + span { color: #6b4511; }
 .un-hint.err { color: var(--danger); }
 .uname { color: var(--brass); font-weight: 700; }
 .ig-uname { margin: -6px 0 2px; color: var(--brass-hi); font-weight: 700; letter-spacing: .01em; }
+.cloud-note { margin: 4px 0; padding: 10px 12px; border-radius: 10px; font-size: .84rem; line-height: 1.45; color: var(--muted); background: var(--inset); border: 1px solid var(--line); }
+.cloud-note.err { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; color: var(--ink); border-color: rgba(239, 141, 119, .45); background: rgba(239, 141, 119, .08); }
+.cloud-note p { margin: 0; }
 </style>
 </head>
 <body>
@@ -2496,7 +2499,10 @@ const I18N = {
   'Юзернейм: только латинские буквы, цифры, «_» и «.» (не в начале и не в конце).': ['Номи корбар: танҳо ҳарфҳои лотинӣ, рақамҳо, «_» ва «.» (на дар аввал ва на дар охир).', 'Username: only Latin letters, digits, “_” and “.” (not at the start or end).'],
   'Этот юзернейм занят.': ['Ин номи корбар банд аст.', 'This username is taken.'], 'Проверяем…': ['Санҷида истодаем…', 'Checking…'],
   '✓ Свободен': ['✓ Озод', '✓ Available'], '✕ Уже занят': ['✕ Аллакай банд', '✕ Already taken'], '✓ Это ваш юзернейм': ['✓ Ин номи корбари шумост', '✓ This is your username'],
-  'Найти по юзернейму': ['Ҷустуҷӯ бо номи корбар', 'Find by username'], '@юзернейм': ['@номи_корбар', '@username'], '@юзернейм или имя…': ['@номи корбар ё ном…', '@username or name…'],
+  'Найти по юзернейму': ['Ҷустуҷӯ бо номи корбар', 'Find by username'], 'Найти друга': ['Ёфтани дӯст', 'Find a friend'], 'Имя или юзернейм': ['Ном ё номи корбар', 'Name or username'],
+  'Начните вводить имя или юзернейм друга — результаты появятся сразу.': ['Номи дӯст ё номи корбарашро нависед — натиҷаҳо фавран пайдо мешаванд.', 'Start typing a friend’s name or username — results appear right away.'],
+  'Никого не нашли. Если друг зарегистрировался раньше, ему нужно один раз открыть обновлённый сайт и войти — тогда он появится в поиске.': ['Касе ёфт нашуд. Агар дӯст пештар ба қайд гирифта шуда бошад, ӯ бояд як бор сайти навшударо кушояд ва ворид шавад — он гоҳ дар ҷустуҷӯ пайдо мешавад.', 'Nobody found. If your friend registered earlier, they need to open the updated site and sign in once — then they will appear in search.'],
+  'Подключаемся к общей базе…': ['Ба пойгоҳи умумӣ пайваст мешавем…', 'Connecting to the shared database…'], 'Повторить': ['Такрор кардан', 'Retry'], '@юзернейм': ['@номи_корбар', '@username'], '@юзернейм или имя…': ['@номи корбар ё ном…', '@username or name…'],
   'Введите юзернейм друга, например @madina — он есть в профиле у каждого.': ['Номи корбари дӯстро ворид кунед, масалан @madina — он дар профили ҳар кас ҳаст.', 'Enter a friend’s username, e.g. @madina — everyone has it in their profile.'],
   'Ищем…': ['Ҷустуҷӯ…', 'Searching…'], 'Никого не нашли.': ['Касе ёфт нашуд.', 'Nobody found.'],
   'Чтобы написать новому человеку, найдите его по юзернейму во вкладке «Друзья».': ['Барои навиштан ба одами нав, ӯро бо номи корбар дар бахши «Дӯстон» ёбед.', 'To message someone new, find them by username in the “Friends” tab.'],
@@ -3051,6 +3057,19 @@ function migrateV6() {
   db.v6 = true; save();
 }
 const atName = u => u && u.username ? '@' + u.username : '';
+const SIMPLE_TJ = { ӣ: 'и', ӯ: 'у', ҳ: 'х', ҷ: 'ч', қ: 'к', ғ: 'г', ё: 'е' };
+const simpleTj = s => s.replace(/[ӣӯҳҷқғё]/g, ch => SIMPLE_TJ[ch]);
+const toLat = s => [...s].map(ch => TO_LAT[ch] ?? ch).join('');
+const searchWord = w => simpleTj(String(w).toLowerCase().replace(/^@+/, '').replace(/[^a-zа-яёӣӯҳҷқғ0-9_.]/g, '')).slice(0, 20);
+// «Мадина Каримова», @madina_k → м, ма, мад… madina, karimova, madina_k — по ним человека находят с первых букв
+function searchKeys(u) {
+  const words = new Set(), add = w => { w = searchWord(w); if (w) words.add(w); };
+  for (const w of String(u.name || '').toLowerCase().split(/[\s-]+/)) { add(w); add(toLat(w)); }
+  if (u.username) { add(u.username); u.username.split(/[._]/).forEach(add); }
+  const keys = new Set();
+  for (const w of words) for (let i = 1; i <= w.length; i++) keys.add(w.slice(0, i));
+  return [...keys].slice(0, 300);
+}
 
 // Общая база: профили, друзья и чаты хранятся в Firestore, а на устройстве — их копия для быстрого показа
 const cloud = { ok: false, uid: null, api: null, fs: null, subs: [], msgSubs: new Map(), ensuring: new Map(), reading: new Set(), asked: new Set(), queue: new Set(), claimed: null, warned: false, reqSeen: null };
@@ -3065,10 +3084,19 @@ async function loadFs() {
 function cloudErr(e, loud) {
   console.warn(e);
   const c = (e && e.code) || '';
+  if (!cloud.ok) cloud.errCode = c || 'unavailable';
   if (!cloud.ok || loud) {
     if (!cloud.ok && !cloud.warned) { cloud.warned = true; toast('Общая база Firestore не подключена — друзья и чаты пока работают только на этом устройстве.'); }
     else if (loud) toast(c === 'permission-denied' ? 'Нет доступа. Обновите страницу и попробуйте снова.' : 'Не получилось. Проверьте интернет и попробуйте снова.');
   }
+}
+function cloudStatusHTML() {
+  if (!FB_AUTH || session.via !== 'fb' || cloudOn()) return '';
+  if (cloud.starting) return '<p class="cloud-note">Подключаемся к общей базе…</p>';
+  const why = { 'permission-denied': 'Общая база отказала в доступе: в Firebase не опубликованы правила (Firestore Database → Rules).',
+    'failed-precondition': 'Общая база Firestore ещё не создана в Firebase.', 'not-found': 'Общая база Firestore ещё не создана в Firebase.',
+    'unavailable': 'Нет связи с общей базой. Проверьте интернет.' }[cloud.errCode] || 'Общая база не подключена.';
+  return `<div class="cloud-note err"><p>${esc(why)} Пока поиск идёт только среди аккаунтов этого устройства.</p><button class="btn ghost small" type="button" id="cloudRetry">Повторить</button></div>`;
 }
 // данные из базы пишут другие люди — принимаем их только в проверенном виде
 function applyProfile(u, d) {
@@ -3086,17 +3114,21 @@ function profileOut(u) {
   const s = (k, n) => String(u[k] || '').slice(0, n);
   return { name: s('name', 80) || 'Читатель', username: u.username, role: pickRole(u.role, 'student'), position: s('position', 80), faculty: s('faculty', 120),
     university: s('university', 120), bio: s('bio', 1000), avatar: u.avatar && SAFE_IMG.test(u.avatar) && u.avatar.length <= 200000 ? u.avatar : '',
-    photo: u.photo && GPHOTO.test(u.photo) ? u.photo : '', banner: Number.isInteger(u.banner) ? u.banner : -1, updatedAt: Date.now() };
+    photo: u.photo && GPHOTO.test(u.photo) ? u.photo : '', banner: Number.isInteger(u.banner) ? u.banner : -1, search: searchKeys(u), updatedAt: Date.now() };
 }
 // местная запись для человека из общей базы (по его uid)
 function localOf(uid) {
   let u = db.users.find(x => x.fbUid === uid);
   if (!u) { u = { id: nextId('users'), fbUid: uid, name: '…', role: 'student', remote: true, created_at: nowStr() }; db.users.push(u); }
-  if (!cloud.asked.has(uid)) { cloud.asked.add(uid); cloud.queue.add(uid); clearTimeout(cloud.qt); cloud.qt = setTimeout(fetchProfiles, 60); }
+  if (!cloud.asked.has(uid)) {
+    cloud.asked.add(uid); cloud.queue.add(uid); clearTimeout(cloud.qt); cloud.qt = setTimeout(fetchProfiles, 60);
+    if (!cloud.qp) cloud.qp = new Promise(res => { cloud.qres = res; });
+  }
   return u.id;
 }
+const profilesReady = () => cloud.qp || Promise.resolve();
 async function fetchProfiles() {
-  const ids = [...cloud.queue].filter(x => x !== cloud.uid); cloud.queue.clear();
+  const ids = [...cloud.queue].filter(x => x !== cloud.uid), done = cloud.qres; cloud.queue.clear(); cloud.qp = cloud.qres = null;
   const api = cloud.api;
   for (let i = 0; i < ids.length; i += 30) {
     try {
@@ -3105,6 +3137,7 @@ async function fetchProfiles() {
     } catch (e) { console.warn(e); }
   }
   save(); cloudRefresh();
+  if (done) done();
 }
 async function cloudClaim(u, n) {
   const api = cloud.api, F = cloud.fs, b = api.writeBatch(F), old = cloud.claimed;
@@ -3143,8 +3176,10 @@ async function cloudStart(u) {
     const snap = await api.getDoc(api.doc(F, 'users', u.fbUid));
     if (cloud.uid !== u.fbUid) return;
     const data = snap.exists() ? snap.data() : null;
-    if (data && data.username) { applyProfile(u, data); cloud.claimed = data.username; }
-    else await publishProfile(u, u.username);
+    if (data && data.username) {
+      applyProfile(u, data); cloud.claimed = data.username;
+      if (!Array.isArray(data.search) || data.search.join() !== searchKeys(u).join()) await api.setDoc(api.doc(F, 'users', u.fbUid), profileOut(u));
+    } else await publishProfile(u, u.username);
     cloud.ok = true; cloud.reqSeen = null;
     cloud.subs.push(api.onSnapshot(api.query(api.collection(F, 'friends'), api.where('users', 'array-contains', u.fbUid)), onFriendsSnap, e => console.warn(e)));
     cloud.subs.push(api.onSnapshot(api.query(api.collection(F, 'chats'), api.where('members', 'array-contains', u.fbUid)), onChatsSnap, e => console.warn(e)));
@@ -3182,7 +3217,7 @@ function onFriendsSnap(snap) {
     list.push({ a: localOf(x.users[0]), b: localOf(x.users[1]), from: localOf(x.from), status: x.status === 'accepted' ? 'accepted' : 'pending', at: +x.at || 0, cloud: d.id });
   });
   const incoming = list.filter(f => f.status === 'pending' && f.from !== mine);
-  if (cloud.reqSeen) incoming.filter(f => !cloud.reqSeen.has(f.cloud)).forEach(f => toast(`Новая заявка в друзья: ${(userById(f.from) || {}).name || ''}`));
+  if (cloud.reqSeen) incoming.filter(f => !cloud.reqSeen.has(f.cloud)).forEach(f => profilesReady().then(() => toast(`Новая заявка в друзья: ${(userById(f.from) || {}).name || ''}`)));
   cloud.reqSeen = new Set(incoming.map(f => f.cloud));
   db.friends = db.friends.filter(f => !f.cloud).concat(list);
   save(); cloudRefresh();
@@ -3234,7 +3269,7 @@ function listenMsgs(cid) {
     });
     const mine = me() && me().id, open = route.name === 'chat' && route.params.c === c.id;
     if (!first && !open) list.filter(m => !old.has(m.cloudId) && !m.system && m.from !== mine).slice(0, 1)
-      .forEach(m => toast(`Новое сообщение от ${(userById(m.from) || {}).name || ''}`));
+      .forEach(m => profilesReady().then(() => toast(`Новое сообщение от ${(userById(m.from) || {}).name || ''}`)));
     first = false;
     db.messages = db.messages.filter(m => m.chat !== c.id).concat(list);
     save(); cloudRefresh();
@@ -3290,22 +3325,33 @@ function cloudMarkRead(c) {
 }
 // поиск людей по юзернейму (по началу: «mad» найдёт @madina)
 let peopleQuery = '', peopleFound = { q: '', ids: [], busy: false };
+const queryWords = value => String(value).split(/\s+/).map(searchWord).filter(Boolean);
 function cloudFind(value) {
   peopleQuery = value;
-  const n = cleanUsername(value).replace(/[^a-z0-9_.]/g, '');
+  const words = queryWords(value), n = words.join(' ');
   clearTimeout(cloud.ft);
-  if (n.length < 2) { peopleFound = { q: n, ids: [], busy: false }; return paintFound(); }
+  if (!n) { peopleFound = { q: '', ids: [], busy: false }; return paintFound(); }
   peopleFound = { q: n, ids: peopleFound.q === n ? peopleFound.ids : [], busy: true }; paintFound();
   cloud.ft = setTimeout(async () => {
     try {
-      const api = cloud.api, s = await api.getDocs(api.query(api.collection(cloud.fs, 'users'), api.where('username', '>=', n), api.where('username', '<=', n + ''), api.limit(12)));
+      const api = cloud.api, users = api.collection(cloud.fs, 'users');
+      const key = words.reduce((a, b) => b.length > a.length ? b : a), un = words[0].replace(/[^a-z0-9_.]/g, '');
+      const [byKey, byName] = await Promise.all([
+        api.getDocs(api.query(users, api.where('search', 'array-contains', key), api.limit(20))),
+        un ? api.getDocs(api.query(users, api.where('username', '>=', un), api.where('username', '<=', un + '\uf8ff'), api.limit(10))) : null]);
+      const found = new Map();
+      for (const s of [byKey, byName]) if (s) s.forEach(d => { if (d.id !== cloud.uid) found.set(d.id, d.data()); });
       const ids = [];
-      s.forEach(d => { if (d.id === cloud.uid) return; const id = localOf(d.id); applyProfile(userById(id), d.data()); ids.push(id); });
-      if (cleanUsername(peopleQuery).replace(/[^a-z0-9_.]/g, '') !== n) return;
-      peopleFound = { q: n, ids, busy: false }; save();
+      for (const [uid, data] of found) {
+        const u = userById(localOf(uid)); applyProfile(u, data);
+        const keys = new Set(searchKeys(u));
+        if (words.every(w => keys.has(w))) ids.push(u.id);     // все слова запроса должны совпасть с началом имени или юзернейма
+      }
+      if (queryWords(peopleQuery).join(' ') !== n) return;
+      peopleFound = { q: n, ids: ids.slice(0, 15), busy: false }; save();
     } catch (e) { peopleFound = { q: n, ids: [], busy: false }; cloudErr(e, true); }
     paintFound();
-  }, 300);
+  }, 250);
 }
 // результаты поиска рисуются на месте, не трогая поле ввода
 function paintFound() {
@@ -3324,9 +3370,10 @@ function friendBtnsHTML(p) {
     : `<button class="btn ghost small" type="button" data-friend="add" data-uid="${p.id}">＋ В друзья</button>`;
 }
 function foundHTML() {
-  if (peopleFound.q.length < 2) return '<p class="muted small fr-empty">Введите юзернейм друга, например @madina — он есть в профиле у каждого.</p>';
+  if (!peopleFound.q) return '<p class="muted small fr-empty">Начните вводить имя или юзернейм друга — результаты появятся сразу.</p>';
   if (peopleFound.busy && !peopleFound.ids.length) return '<p class="muted small fr-empty">Ищем…</p>';
-  return peopleFound.ids.map(userById).filter(p => p && p.id !== me().id).map(p => personRowHTML(p, friendBtnsHTML(p))).join('') || '<p class="muted small fr-empty">Никого не нашли.</p>';
+  return peopleFound.ids.map(userById).filter(p => p && p.id !== me().id).map(p => personRowHTML(p, friendBtnsHTML(p))).join('')
+    || (peopleFound.busy ? '<p class="muted small fr-empty">Ищем…</p>' : '<p class="muted small fr-empty">Никого не нашли. Если друг зарегистрировался раньше, ему нужно один раз открыть обновлённый сайт и войти — тогда он появится в поиске.</p>');
 }
 // поле «Юзернейм»: подсказка и проверка, свободен ли
 function checkUsernameField(inp, exceptId) {
@@ -3764,11 +3811,12 @@ const views = {
         ${reqs.length ? `<p class="fr-h">Заявки в друзья · ${reqs.length}</p>${reqs.map(f => { const p = userById(f.from); return p ? personRow(p, `<button class="btn small" type="button" data-friend="accept" data-uid="${p.id}">Принять</button><button class="btn ghost small" type="button" data-friend="decline" data-uid="${p.id}">Отклонить</button>`) : ''; }).join('')}` : ''}
         <p class="fr-h">Мои друзья · ${friends.length}</p>
         ${friends.map(p => personRow(p, `<a class="btn small" data-go="chat" data-with="${p.id}" href="#">Написать</a><button class="link" type="button" data-friend="remove" data-uid="${p.id}" title="Удалить из друзей">✕</button>`)).join('') || '<p class="muted small fr-empty">Пока нет друзей. Найдите людей ниже.</p>'}
-        ${cloudOn() ? `<p class="fr-h">Найти по юзернейму</p>
-        <input id="peopleFind" value="${esc(peopleQuery)}" placeholder="@юзернейм" aria-label="Найти по юзернейму" autocomplete="off" autocapitalize="none" spellcheck="false">
+        ${cloudStatusHTML()}
+        ${cloudOn() ? `<p class="fr-h">Найти друга</p>
+        <input id="peopleFind" value="${esc(peopleQuery)}" placeholder="Имя или юзернейм" aria-label="Найти друга по имени или юзернейму" autocomplete="off" autocapitalize="none" spellcheck="false">
         <div id="peopleFound">${foundHTML()}</div>`
         : `<p class="fr-h">Найти людей</p>
-        <input id="peopleFind" placeholder="@юзернейм или имя…" aria-label="Найти людей" autocomplete="off" autocapitalize="none" spellcheck="false">
+        <input id="peopleFind" placeholder="Имя или юзернейм" aria-label="Найти людей" autocomplete="off" autocapitalize="none" spellcheck="false">
         <div id="peopleFound">${others.filter(p => !['friends', 'received'].includes(friendState(u.id, p.id))).map(p => personRow(p, friendBtns(p))).join('') || '<p class="muted small fr-empty">Все участники уже у вас в друзьях.</p>'}</div>`}
       </div>`
       : `<div class="cl-items">${listed.map(item).join('') || `<div class="cl-empty"><p class="muted">${tab === 'group' ? 'Групп пока нет.' : 'Чатов пока нет.'}</p>
@@ -4610,6 +4658,7 @@ document.addEventListener('click', e => {
   if (lg) return setSetting('lang', lg.dataset.lang, true);
   const ms = e.target.closest('[data-season]');
   if (ms) { settings.season = ms.dataset.season; settings.fire = 'auto'; saveSettings(); applySettings(); toast('За окном: ' + ms.textContent.trim()); return; }
+  if (id === 'cloudRetry') { cloud.warned = false; cloudStart(me()); return setTimeout(() => render({ soft: true }), 50); }
   const au = e.target.closest('[data-auth]');
   if (au) { e.preventDefault(); closeSettings(); return openAuth(au.dataset.auth || 'login'); }
   if (e.target.closest('[data-google]')) return googleSignIn();
