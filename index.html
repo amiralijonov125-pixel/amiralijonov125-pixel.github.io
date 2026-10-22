@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-T+YPk+AsD7t/h+rF3tmjCkT4lJBBCW1qldxNv9f88PI=' 'sha256-WcR3QbibH0SntLmNNhTH2mN+ESU0oWreEiMwOWZ5HtE=' 'sha256-9KlGBtqwsNGeTYmR4oDTNUU8tPMIQmwsRtH0ESN0GBk=' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://www.gstatic.com https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://*.googleusercontent.com; connect-src 'self' https://*.googleapis.com https://apis.google.com; media-src 'self' blob: data:; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src https://*.firebaseapp.com https://*.web.app https://accounts.google.com https://apis.google.com; manifest-src 'self'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-T+YPk+AsD7t/h+rF3tmjCkT4lJBBCW1qldxNv9f88PI=' 'sha256-zGksMWxpmmgH/Z5byOHfoXnU5ji2b48JlMLudIQLHvE=' 'sha256-9KlGBtqwsNGeTYmR4oDTNUU8tPMIQmwsRtH0ESN0GBk=' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://www.gstatic.com https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://*.googleusercontent.com; connect-src 'self' https://*.googleapis.com https://apis.google.com; media-src 'self' blob: data:; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src https://*.firebaseapp.com https://*.web.app https://accounts.google.com https://apis.google.com; manifest-src 'self'; upgrade-insecure-requests">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="Китобхона — университетская онлайн-библиотека: книги, эссе и стихи преподавателей с проверкой оригинальности и ИИ-помощником.">
 <meta name="theme-color" content="#0d0907">
@@ -1027,6 +1027,15 @@ body[data-skin="parchment"] .role-pick input:checked + span { color: #6b4511; }
 .acct-btn:hover .ig-ring { transform: scale(1.06); }
 .acct-btn .ig-ring.sm > .avatar { width: 30px; height: 30px; }
 @media (max-width: 760px) { .acct-btn { padding: 0; border: 0; background: none; } .acct-l { display: none; } }
+/* ---------- юзернеймы */
+.un-wrap { position: relative; display: block; margin-top: 6px; }
+.un-wrap input { margin-top: 0; padding-left: 30px; }
+.un-at { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); color: var(--brass); font-weight: 700; pointer-events: none; }
+.un-hint { display: block; margin-top: -4px; font-size: .78rem; color: var(--faint); }
+.un-hint.ok { color: var(--leaf); }
+.un-hint.err { color: var(--danger); }
+.uname { color: var(--brass); font-weight: 700; }
+.ig-uname { margin: -6px 0 2px; color: var(--brass-hi); font-weight: 700; letter-spacing: .01em; }
 </style>
 </head>
 <body>
@@ -1317,6 +1326,8 @@ function sanitizeDb(d) {
     if (u.banner != null && ((u.banner = toInt(u.banner)) === null || u.banner < 0)) delete u.banner;
     if (u.pw != null && !isRec(u.pw)) delete u.pw;
     strs(u, ['fbUid']);
+    if (u.username != null && !(typeof u.username === 'string' && USERNAME_RE.test(u.username))) delete u.username;
+    if (u.remote != null) u.remote = !!u.remote;
     if (u.fbProvider != null && u.fbProvider !== 'google' && u.fbProvider !== 'password') delete u.fbProvider;
     if (u.photo != null && !(typeof u.photo === 'string' && GPHOTO.test(u.photo))) delete u.photo;
     if (u.photoOff != null) u.photoOff = !!u.photoOff;
@@ -1335,17 +1346,17 @@ function sanitizeDb(d) {
   recs('ratings', ['user_id', 'book_id']).forEach(r => { r.stars = Math.max(1, Math.min(5, toInt(r.stars) || 1)); });
   recs('comments', ['id', 'book_id', 'user_id']).forEach(c => strs(c, ['text', 'created_at'], true));
   if (d.chats != null) recs('chats', ['id']).forEach(c => {
-    c.type = c.type === 'group' ? 'group' : 'direct'; c.members = ids(c.members); strs(c, ['emoji']); strs(c, ['name'], c.type === 'group');
+    c.type = c.type === 'group' ? 'group' : 'direct'; c.members = ids(c.members); strs(c, ['emoji', 'cloudId']); strs(c, ['name'], c.type === 'group');
     if (c.owner != null) c.owner = toInt(c.owner);
     if (c.color != null) c.color = Math.max(0, toInt(c.color) || 0);
     if (c.createdAt != null) c.createdAt = +c.createdAt || 0;
   });
   if (d.messages != null) recs('messages', d.v5 ? ['id', 'chat', 'from'] : ['id', 'from']).forEach(m => {
-    strs(m, ['text'], true); m.at = +m.at || 0;
+    strs(m, ['text'], true); strs(m, ['cloudId']); m.at = +m.at || 0;
     if (m.readBy != null) m.readBy = ids(m.readBy);
     if (m.system != null) m.system = !!m.system;
   });
-  if (d.friends != null) recs('friends', ['a', 'b', 'from']).forEach(f => { f.status = f.status === 'accepted' ? 'accepted' : 'pending'; f.at = +f.at || 0; });
+  if (d.friends != null) recs('friends', ['a', 'b', 'from']).forEach(f => { f.status = f.status === 'accepted' ? 'accepted' : 'pending'; f.at = +f.at || 0; strs(f, ['cloud']); });
   return d;
 }
 function cleanSession(s) {
@@ -1363,6 +1374,7 @@ async function load() {
     if (!db.v3) migrateV3();
     if (!db.v4) migrateV4();
     if (!db.v5) migrateV5();
+    if (!db.v6) migrateV6();
   } catch (e) { console.error(e); }
   await loadShared();
 }
@@ -2225,7 +2237,7 @@ function renderSettings() {
   const sec = (i, title, body) => `<section class="set-sec pop" style="--i:${i}"><h3>${title}</h3>${body}</section>`;
   d.innerHTML = `<div class="set-head"><h2>Настройки</h2><button class="icon-btn" type="button" id="settingsClose" aria-label="Закрыть" title="Закрыть">✕</button></div>
     <div class="set-body">
-    ${sec(0, 'Профиль', u ? `<div class="set-me">${avatar(u, 'lg')}<div><b>${esc(u.name)}</b> ${roleBadge(u)}<small class="muted">${esc(u.email)}</small></div></div>
+    ${sec(0, 'Профиль', u ? `<div class="set-me">${avatar(u, 'lg')}<div><b>${esc(u.name)}</b> ${roleBadge(u)}<small class="muted">${u.username ? `<span class="uname">@${esc(u.username)}</span> · ` : ''}${esc(u.email)}</small></div></div>
         <div class="row"><a class="btn small" data-go="profile" data-id="${u.id}" href="#">Мой профиль</a><a class="btn ghost small" data-go="editProfile" href="#">Редактировать профиль</a><a class="btn ghost small" id="logout" href="#">Выйти</a></div>
         ${DEMO_MODE && demoUsers().some(x => x.id !== u.id) ? `<span class="field-label">Демо: сменить аккаунт</span><div class="demo-users">${demoUsers().filter(x => x.id !== u.id).map(x => `<button type="button" class="demo-user" data-demo-user="${x.id}">${avatar(x)}<span>${esc(x.name)}</span></button>`).join('')}</div>` : ''}`
       : `<p class="muted">Вы не вошли в аккаунт</p><p class="muted small">Войдите, чтобы публиковать и комментировать.</p><div class="row"><a class="btn small" data-auth="login" href="#">Войти</a><a class="btn ghost small" data-auth="register" href="#">Регистрация</a></div>`)}
@@ -2477,7 +2489,23 @@ const I18N = {
   'Защита от спама в чате и комментариях': ['Ҳифз аз спам дар чат ва шарҳҳо', 'Spam protection in chat and comments'],
   'Защита от XSS: любой текст пользователей экранируется': ['Ҳифз аз XSS: ҳар матни корбарон безарар карда мешавад', 'XSS protection: all user text is escaped'],
   'Вход через Google (Firebase Authentication)': ['Воридшавӣ бо Google (Firebase Authentication)', 'Sign-in with Google (Firebase Authentication)'],
-  'Войти через Google': ['Ворид шудан бо Google', 'Sign in with Google'], 'Продолжить с Google': ['Идома бо Google', 'Continue with Google'],
+  'Войти через Google': ['Ворид шудан бо Google', 'Sign in with Google'], 'Юзернейм': ['Номи корбар', 'Username'],
+  'Латинские буквы, цифры, «_» и «.» — по нему вас найдут друзья.': ['Ҳарфҳои лотинӣ, рақамҳо, «_» ва «.» — дӯстон шуморо бо он меёбанд.', 'Latin letters, digits, “_” and “.” — friends will find you by it.'],
+  'По юзернейму вас находят друзья. Латинские буквы, цифры, «_» и «.».': ['Дӯстон шуморо бо номи корбар меёбанд. Ҳарфҳои лотинӣ, рақамҳо, «_» ва «.».', 'Friends find you by your username. Latin letters, digits, “_” and “.”.'],
+  'Придумайте юзернейм.': ['Номи корбарро интихоб кунед.', 'Choose a username.'], 'Юзернейм: от 3 до 20 знаков.': ['Номи корбар: аз 3 то 20 аломат.', 'Username: 3 to 20 characters.'],
+  'Юзернейм: только латинские буквы, цифры, «_» и «.» (не в начале и не в конце).': ['Номи корбар: танҳо ҳарфҳои лотинӣ, рақамҳо, «_» ва «.» (на дар аввал ва на дар охир).', 'Username: only Latin letters, digits, “_” and “.” (not at the start or end).'],
+  'Этот юзернейм занят.': ['Ин номи корбар банд аст.', 'This username is taken.'], 'Проверяем…': ['Санҷида истодаем…', 'Checking…'],
+  '✓ Свободен': ['✓ Озод', '✓ Available'], '✕ Уже занят': ['✕ Аллакай банд', '✕ Already taken'], '✓ Это ваш юзернейм': ['✓ Ин номи корбари шумост', '✓ This is your username'],
+  'Найти по юзернейму': ['Ҷустуҷӯ бо номи корбар', 'Find by username'], '@юзернейм': ['@номи_корбар', '@username'], '@юзернейм или имя…': ['@номи корбар ё ном…', '@username or name…'],
+  'Введите юзернейм друга, например @madina — он есть в профиле у каждого.': ['Номи корбари дӯстро ворид кунед, масалан @madina — он дар профили ҳар кас ҳаст.', 'Enter a friend’s username, e.g. @madina — everyone has it in their profile.'],
+  'Ищем…': ['Ҷустуҷӯ…', 'Searching…'], 'Никого не нашли.': ['Касе ёфт нашуд.', 'Nobody found.'],
+  'Чтобы написать новому человеку, найдите его по юзернейму во вкладке «Друзья».': ['Барои навиштан ба одами нав, ӯро бо номи корбар дар бахши «Дӯстон» ёбед.', 'To message someone new, find them by username in the “Friends” tab.'],
+  'Общая база Firestore не подключена — друзья и чаты пока работают только на этом устройстве.': ['Пойгоҳи умумии Firestore пайваст нест — дӯстон ва чатҳо ҳоло танҳо дар ҳамин дастгоҳ кор мекунанд.', 'The shared Firestore database is not connected — friends and chats work only on this device for now.'],
+  'Нет доступа. Обновите страницу и попробуйте снова.': ['Дастрасӣ нест. Саҳифаро нав кунед ва боз кӯшиш кунед.', 'Access denied. Reload the page and try again.'],
+  'Не получилось. Проверьте интернет и попробуйте снова.': ['Нашуд. Интернетро санҷед ва боз кӯшиш кунед.', 'That did not work. Check your internet and try again.'],
+  'Нет связи с общей базой. Попробуйте чуть позже.': ['Бо пойгоҳи умумӣ пайваст нест. Каме баъд кӯшиш кунед.', 'No connection to the shared database. Try again a little later.'],
+  'Этот участник есть только на этом устройстве.': ['Ин корбар танҳо дар ҳамин дастгоҳ аст.', 'This member exists only on this device.'],
+  'Не удалось сохранить юзернейм.': ['Номи корбарро нигоҳ доштан нашуд.', 'Could not save the username.'], 'Продолжить с Google': ['Идома бо Google', 'Continue with Google'],
   'Аккаунт': ['Ҳисоб', 'Account'], 'Вход и регистрация': ['Воридшавӣ ва бақайдгирӣ', 'Sign in and sign up'], 'Аккаунт: вход и регистрация': ['Ҳисоб: воридшавӣ ва бақайдгирӣ', 'Account: sign in and sign up'],
   'Войдите или зарегистрируйтесь, чтобы публиковать, оценивать и общаться. Читать можно и без аккаунта.': ['Ворид шавед ё ба қайд гиред, то нашр кунед, баҳо диҳед ва муошират кунед. Хондан бе ҳисоб ҳам мумкин аст.', 'Sign in or sign up to publish, rate and chat. You can read without an account.'],
   'Чтобы продолжить, войдите или зарегистрируйтесь — это займёт минуту.': ['Барои идома ворид шавед ё ба қайд гиред — ин як дақиқа вақт мегирад.', 'To continue, sign in or sign up — it takes a minute.'],
@@ -2555,7 +2583,7 @@ const I18N_RE = [
   [/^Вся библиотека · (.+)$/, 'Ҳамаи китобҳо · $1', 'Whole library · $1'], [/^Таджикская библиотека · (.+) произведений$/, 'Китобхонаи тоҷикӣ · $1 асар', 'Tajik library · $1 works'],
   [/^Стр\. (\d+) из (\d+)$/, 'Саҳ. $1 аз $2', 'Page $1 of $2'], [/^Комментарии \((\d+)\)$/, 'Шарҳҳо ($1)', 'Comments ($1)'], [/^(\d+) произв\.$/, '$1 асар', '$1 works'],
   [/^страниц: (\d+)$/, 'саҳифа: $1', 'pages: $1'], [/^(\d+) в каталоге$/, '$1 дар феҳрист', '$1 in catalogue'], [/^только в каталоге$/, 'танҳо дар феҳрист', 'catalogue only'],
-  [/^Опубликовано: «(.+)»$/, 'Нашр шуд: «$1»', 'Published: “$1”'], [/^Салом, (.+)!$/, 'Салом, $1!', 'Hello, $1!'], [/^Читаю файл… (\d+) из (\d+) стр\.$/, 'Файл хонда мешавад… $1 аз $2 саҳ.', 'Reading the file… page $1 of $2'], [/^Неверная почта или пароль\. Осталось попыток: (\d+)\.$/, 'Почта ё парол нодуруст аст. Кӯшишҳои боқимонда: $1.', 'Wrong email or password. Attempts left: $1.'], [/^Добро пожаловать, (.+)! Расскажите немного о себе\.$/, 'Хуш омадед, $1! Каме дар бораи худ нависед.', 'Welcome, $1! Tell us a little about yourself.'],
+  [/^Опубликовано: «(.+)»$/, 'Нашр шуд: «$1»', 'Published: “$1”'], [/^Салом, (.+)!$/, 'Салом, $1!', 'Hello, $1!'], [/^Юзернейм @(.+) уже занят\.$/, 'Номи корбари @$1 аллакай банд аст.', 'The username @$1 is already taken.'], [/^Юзернейм @(.+) уже занят — придумайте другой\.$/, 'Номи корбари @$1 аллакай банд аст — дигареро интихоб кунед.', 'The username @$1 is already taken — choose another one.'], [/^Юзернейм @(.+) занят — вам выдан @(.+)\. Изменить можно в профиле\.$/, 'Номи корбари @$1 банд аст — ба шумо @$2 дода шуд. Онро дар профил иваз кардан мумкин аст.', 'The username @$1 is taken — you got @$2. You can change it in your profile.'], [/^Новая заявка в друзья: (.+)$/, 'Дархости нави дӯстӣ: $1', 'New friend request: $1'], [/^Новое сообщение от (.+)$/, 'Паёми нав аз $1', 'New message from $1'], [/^Читаю файл… (\d+) из (\d+) стр\.$/, 'Файл хонда мешавад… $1 аз $2 саҳ.', 'Reading the file… page $1 of $2'], [/^Неверная почта или пароль\. Осталось попыток: (\d+)\.$/, 'Почта ё парол нодуруст аст. Кӯшишҳои боқимонда: $1.', 'Wrong email or password. Attempts left: $1.'], [/^Добро пожаловать, (.+)! Расскажите немного о себе\.$/, 'Хуш омадед, $1! Каме дар бораи худ нависед.', 'Welcome, $1! Tell us a little about yourself.'],
   [/^Искать «(.+)» везде →$/, '«$1»-ро дар ҳама ҷо ҷустан →', 'Search “$1” everywhere →'], [/^Открыть на сайте (.+) ↗$/, 'Кушодан дар сайти $1 ↗', 'Open on $1 ↗'],
   [/^В Китобхоне найдено: (.+)\.$/, 'Дар Китобхона ёфт шуд: $1.', 'Found on Kitobkhona: $1.'],
   [/^✓ Проверено на оригинальность · (\d+)%$/, '✓ Асолат санҷида шуд · $1%', '✓ Originality checked · $1%'], [/^⚠ Проверено, есть совпадения · (\d+)%$/, '⚠ Санҷида шуд, мувофиқат ҳаст · $1%', '⚠ Checked, matches found · $1%'],
@@ -2667,7 +2695,8 @@ function initFb() {
   if (!fb.ready) fb.ready = (async () => {
     const [app, api] = await Promise.all([import(FIREBASE_SDK + 'firebase-app.js'), import(FIREBASE_SDK + 'firebase-auth.js')]);
     fb.api = api;
-    fb.auth = api.getAuth(app.initializeApp(FB_CONFIG));
+    fb.app = app.initializeApp(FB_CONFIG);
+    fb.auth = api.getAuth(fb.app);
     fb.auth.languageCode = fbLang();
     api.onAuthStateChanged(fb.auth, onFbUser);
     api.getRedirectResult(fb.auth).catch(authError);
@@ -2768,16 +2797,19 @@ async function doLogin(form) {
 async function doRegister(form) {
   const role = pickRole((form.querySelector('input[name="aRole"]:checked') || {}).value, 'student');
   const name = cleanText(form.rName.value).trim().slice(0, 80), email = form.rEmail.value.trim().toLowerCase(), pw = form.rPw.value;
+  const uname = cleanUsername(form.rUser.value);
   if (!name) return authMsg('Введите имя.');
+  const up = usernameProblem(uname); if (up) return authMsg(up);
   if (!EMAIL_RE.test(email) || email.length > 254) return authMsg('Проверьте адрес почты.');
   const problem = pwProblem(pw, email, name); if (problem) return authMsg(problem);
   if (pw !== form.rPw2.value) return authMsg('Пароли не совпадают.');
   const done = authBusy(form, 'Создаём аккаунт…');
   try {
+    if (!(await usernameFree(uname))) return authMsg(`Юзернейм @${uname} уже занят — придумайте другой.`);
     if (FB_AUTH) {
       const auth = await initFb(), api = fb.api;
       await api.setPersistence(auth, api.browserLocalPersistence);
-      pendingReg = { name, role }; authClick = true; authRemember = true;
+      pendingReg = { name, role, username: uname }; authClick = true; authRemember = true;
       auth.languageCode = fbLang();
       const cred = await api.createUserWithEmailAndPassword(auth, email, pw);
       api.updateProfile(cred.user, { displayName: name }).catch(() => {});
@@ -2785,7 +2817,7 @@ async function doRegister(form) {
       return;
     }
     if (db.users.some(x => x.email === email)) { showTab('login', email); return authMsg('Эта почта уже зарегистрирована — войдите в аккаунт.'); }
-    const nu = { id: nextId('users'), name, email, role, position: ROLE[role], bio: '', created_at: nowStr() };
+    const nu = { id: nextId('users'), name, email, role, position: ROLE[role], bio: '', created_at: nowStr(), username: uname };
     await setPassword(nu, pw);
     db.users.push(nu); startSession(nu, true); closeAuth(); authNext = null;
     toast('Аккаунт создан. Добавьте фото и пару слов о себе.');
@@ -2815,7 +2847,7 @@ async function sendReset(email) {
 function onFbUser(fu) {
   const cur = me();
   if (!fu) {
-    if (cur && session.via === 'fb') { session = { userId: null, signedOut: true }; save(); render({ soft: true }); }
+    if (cur && session.via === 'fb') { cloudStop(true); session = { userId: null, signedOut: true }; save(); render({ soft: true }); }
     return;
   }
   // человек сам вышел или вошёл другим способом — молча обратно не впускаем
@@ -2832,17 +2864,19 @@ function onFbUser(fu) {
   if (!u) {
     const role = reg ? reg.role : 'student';
     u = { id: nextId('users'), name: (reg && reg.name) || cleanText(fu.displayName || email.split('@')[0] || 'Читатель').trim().slice(0, 80) || 'Читатель',
-      email, role, position: ROLE[role], bio: '', created_at: nowStr() };
+      email, role, position: ROLE[role], bio: '', created_at: nowStr(), ...(reg && reg.username ? { username: reg.username } : {}) };
     db.users.push(u);
   }
   u.fbUid = String(fu.uid).slice(0, 128);
   u.fbProvider = google ? 'google' : 'password';
   if (email) u.email = email;
   if (google && !u.photoOff) { const ph = googlePhoto(fu.photoURL); if (ph) u.photo = ph; }
-  if (session.userId === u.id && session.via === 'fb') { authClick = false; save(); return; }
+  delete u.remote;
+  if (session.userId === u.id && session.via === 'fb') { authClick = false; save(); cloudStart(u); return; }
   const btn = document.querySelector('#authModal:not([hidden]) .auth-submit:not([hidden]), #authModal:not([hidden]) [data-google]');
   const r = btn && btn.getBoundingClientRect();
   startSession(u, authRemember, 'fb');
+  cloudStart(u);
   if (authClick && r && r.width && window.kitobFx) window.kitobFx.sparks(r.left + r.width / 2, r.top + r.height / 2, 50, 1.3);
   authClick = false; authRemember = true;
   closeAuth();
@@ -2892,6 +2926,8 @@ function authHTML(tab) {
           <label><input type="radio" name="aRole" value="teacher"><span><i aria-hidden="true">📚</i> Преподаватель</span></label>
         </div>
         <label>Имя и фамилия<input name="rName" required maxlength="80" autocomplete="name"></label>
+        <label>Юзернейм<span class="un-wrap"><span class="un-at" aria-hidden="true">@</span><input name="rUser" data-hint="rUserHint" required maxlength="20" autocomplete="nickname" autocapitalize="none" spellcheck="false" placeholder="madina_k"></span></label>
+        <small class="un-hint" id="rUserHint">Латинские буквы, цифры, «_» и «.» — по нему вас найдут друзья.</small>
         <label>Почта<input type="email" name="rEmail" required maxlength="254" autocomplete="email" inputmode="email"></label>
         <label>Пароль<span class="pw-wrap"><input type="password" name="rPw" required minlength="8" maxlength="128" autocomplete="new-password">${EYE}</span></label>
         ${strengthHTML('authMeter')}
@@ -2968,6 +3004,9 @@ function closeAuth() {
   });
   m.addEventListener('input', e => {
     if (e.target.name === 'rPw') updateStrength(e.target, document.getElementById('authMeter'));
+    const f = e.target.form;
+    if (e.target.name === 'rName' && f && !f.rUser.dataset.touched) { f.rUser.value = suggestUsername(e.target.value); checkUsernameField(f.rUser); }
+    if (e.target.name === 'rUser') { e.target.dataset.touched = '1'; checkUsernameField(e.target); }
     const msg = document.getElementById('authMsg');
     if (msg && !msg.hidden && msg.classList.contains('err')) msg.hidden = true;
   });
@@ -2980,6 +3019,330 @@ document.addEventListener('error', e => {
     const s = document.createElement('span'); s.className = im.className; s.textContent = im.dataset.l; im.replaceWith(s);
   }
 }, true);
+
+// ------------------------------------------------------------------ юзернеймы и общий мессенджер (Firestore)
+// Юзернейм уникален: по нему друга находят с любого устройства. 3–20 знаков: латиница, цифры, «_» и «.»
+const USERNAME_RE = /^[a-z0-9_][a-z0-9_.]{1,18}[a-z0-9_]$/;
+const RESERVED_NAMES = ['admin', 'administrator', 'kitobkhona', 'support', 'moderator', 'root', 'system'];
+const TO_LAT = { а: 'a', б: 'b', в: 'v', г: 'g', ғ: 'gh', д: 'd', е: 'e', ё: 'yo', ж: 'zh', з: 'z', и: 'i', ӣ: 'i', й: 'y', к: 'k', қ: 'q', л: 'l', м: 'm', н: 'n', о: 'o',
+  п: 'p', р: 'r', с: 's', т: 't', у: 'u', ӯ: 'u', ф: 'f', х: 'kh', ҳ: 'h', ч: 'ch', ҷ: 'j', ш: 'sh', щ: 'sh', ъ: '', ы: 'y', ь: '', э: 'e', ю: 'yu', я: 'ya' };
+const cleanUsername = s => String(s || '').trim().toLowerCase().replace(/^@+/, '').slice(0, 30);
+function usernameProblem(n) {
+  if (!n) return 'Придумайте юзернейм.';
+  if (n.length < 3 || n.length > 20) return 'Юзернейм: от 3 до 20 знаков.';
+  if (!USERNAME_RE.test(n)) return 'Юзернейм: только латинские буквы, цифры, «_» и «.» (не в начале и не в конце).';
+  if (RESERVED_NAMES.includes(n)) return 'Этот юзернейм занят.';
+  return '';
+}
+// «Мадина Каримова» → madina_karimova
+function suggestUsername(src) {
+  let s = [...String(src || '').toLowerCase()].map(ch => TO_LAT[ch] ?? ch).join('')
+    .replace(/[\s-]+/g, '_').replace(/[^a-z0-9_.]/g, '').replace(/[._]{2,}/g, '_').replace(/^[._]+/, '').slice(0, 18).replace(/[._]+$/, '');
+  return s.length >= 3 ? s : (s + '_reader').replace(/^_/, '').slice(0, 12);
+}
+const localUsernameTaken = (n, exceptId) => db.users.some(x => x.username === n && x.id !== exceptId && !x.remote);
+function uniqueLocalUsername(base, exceptId) {
+  let n = base, i = 1;
+  while (localUsernameTaken(n, exceptId) || RESERVED_NAMES.includes(n)) n = base.slice(0, 16) + (++i);
+  return n;
+}
+function migrateV6() {
+  db.users.forEach(u => { if (!u.username && !u.remote) u.username = uniqueLocalUsername(suggestUsername(isDemoUser(u) || !u.email ? u.name : u.email.split('@')[0]), u.id); });
+  db.v6 = true; save();
+}
+const atName = u => u && u.username ? '@' + u.username : '';
+
+// Общая база: профили, друзья и чаты хранятся в Firestore, а на устройстве — их копия для быстрого показа
+const cloud = { ok: false, uid: null, api: null, fs: null, subs: [], msgSubs: new Map(), ensuring: new Map(), reading: new Set(), asked: new Set(), queue: new Set(), claimed: null, warned: false, reqSeen: null };
+const cloudOn = () => cloud.ok && session.via === 'fb' && !!me() && me().fbUid === cloud.uid;
+async function loadFs() {
+  if (cloud.api) return cloud.api;
+  await initFb();
+  const api = await import(FIREBASE_SDK + 'firebase-firestore.js');
+  cloud.fs = api.getFirestore(fb.app);
+  return (cloud.api = api);
+}
+function cloudErr(e, loud) {
+  console.warn(e);
+  const c = (e && e.code) || '';
+  if (!cloud.ok || loud) {
+    if (!cloud.ok && !cloud.warned) { cloud.warned = true; toast('Общая база Firestore не подключена — друзья и чаты пока работают только на этом устройстве.'); }
+    else if (loud) toast(c === 'permission-denied' ? 'Нет доступа. Обновите страницу и попробуйте снова.' : 'Не получилось. Проверьте интернет и попробуйте снова.');
+  }
+}
+// данные из базы пишут другие люди — принимаем их только в проверенном виде
+function applyProfile(u, d) {
+  if (!isRec(d)) return;
+  const s = (v, n) => typeof v === 'string' ? cleanText(v).slice(0, n).trim() : '';
+  if (s(d.name, 80)) u.name = s(d.name, 80);
+  if (typeof d.username === 'string' && USERNAME_RE.test(d.username)) u.username = d.username;
+  u.role = pickRole(d.role, u.role || 'student');
+  u.position = s(d.position, 80); u.faculty = s(d.faculty, 120); u.university = s(d.university, 120); u.bio = s(d.bio, 1000);
+  if (typeof d.avatar === 'string' && SAFE_IMG.test(d.avatar)) u.avatar = d.avatar; else delete u.avatar;
+  if (typeof d.photo === 'string' && GPHOTO.test(d.photo)) u.photo = d.photo; else delete u.photo;
+  if (Number.isInteger(d.banner) && d.banner >= 0) u.banner = d.banner % PALS.length; else delete u.banner;
+}
+function profileOut(u) {
+  const s = (k, n) => String(u[k] || '').slice(0, n);
+  return { name: s('name', 80) || 'Читатель', username: u.username, role: pickRole(u.role, 'student'), position: s('position', 80), faculty: s('faculty', 120),
+    university: s('university', 120), bio: s('bio', 1000), avatar: u.avatar && SAFE_IMG.test(u.avatar) && u.avatar.length <= 200000 ? u.avatar : '',
+    photo: u.photo && GPHOTO.test(u.photo) ? u.photo : '', banner: Number.isInteger(u.banner) ? u.banner : -1, updatedAt: Date.now() };
+}
+// местная запись для человека из общей базы (по его uid)
+function localOf(uid) {
+  let u = db.users.find(x => x.fbUid === uid);
+  if (!u) { u = { id: nextId('users'), fbUid: uid, name: '…', role: 'student', remote: true, created_at: nowStr() }; db.users.push(u); }
+  if (!cloud.asked.has(uid)) { cloud.asked.add(uid); cloud.queue.add(uid); clearTimeout(cloud.qt); cloud.qt = setTimeout(fetchProfiles, 60); }
+  return u.id;
+}
+async function fetchProfiles() {
+  const ids = [...cloud.queue].filter(x => x !== cloud.uid); cloud.queue.clear();
+  const api = cloud.api;
+  for (let i = 0; i < ids.length; i += 30) {
+    try {
+      const s = await api.getDocs(api.query(api.collection(cloud.fs, 'users'), api.where(api.documentId(), 'in', ids.slice(i, i + 30))));
+      s.forEach(d => { const u = db.users.find(x => x.fbUid === d.id); if (u) applyProfile(u, d.data()); });
+    } catch (e) { console.warn(e); }
+  }
+  save(); cloudRefresh();
+}
+async function cloudClaim(u, n) {
+  const api = cloud.api, F = cloud.fs, b = api.writeBatch(F), old = cloud.claimed;
+  b.set(api.doc(F, 'usernames', n), { uid: u.fbUid });
+  b.set(api.doc(F, 'users', u.fbUid), profileOut({ ...u, username: n }));
+  if (old && old !== n) b.delete(api.doc(F, 'usernames', old));
+  await b.commit();
+  u.username = n; cloud.claimed = n; save();
+}
+// первый вход: профиль появляется в общей базе, юзернейм занимается (если занят — подбираем свободный)
+async function publishProfile(u, wanted) {
+  const tries = [...new Set([wanted, u.username, u.email && suggestUsername(u.email.split('@')[0]), suggestUsername(u.name)].map(cleanUsername).filter(n => n && !usernameProblem(n)))];
+  const base = tries[0] || 'reader';
+  for (let i = 0; i < 8; i++) {
+    const n = i < tries.length ? tries[i] : base.slice(0, 15) + Math.floor(1000 + Math.random() * 9000);
+    try {
+      await cloudClaim(u, n);
+      if (wanted && n !== wanted) toast(`Юзернейм @${wanted} занят — вам выдан @${n}. Изменить можно в профиле.`);
+      return;
+    } catch (e) { if (e && e.code !== 'permission-denied') throw e; }
+  }
+  throw new Error('username');
+}
+async function usernameFree(n, exceptId) {
+  if (localUsernameTaken(n, exceptId)) return false;
+  if (!FB_AUTH) return true;
+  try { const api = await loadFs(), s = await api.getDoc(api.doc(cloud.fs, 'usernames', n)); return !s.exists() || (me() && s.data().uid === me().fbUid); }
+  catch (e) { return true; }                                   // база недоступна — окончательно проверится при сохранении
+}
+async function cloudStart(u) {
+  if (!FB_AUTH || !u || !u.fbUid || ((cloud.ok || cloud.starting) && cloud.uid === u.fbUid)) return;
+  cloudStop();
+  cloud.uid = u.fbUid; cloud.starting = true;
+  try {
+    const api = await loadFs(), F = cloud.fs;
+    const snap = await api.getDoc(api.doc(F, 'users', u.fbUid));
+    if (cloud.uid !== u.fbUid) return;
+    const data = snap.exists() ? snap.data() : null;
+    if (data && data.username) { applyProfile(u, data); cloud.claimed = data.username; }
+    else await publishProfile(u, u.username);
+    cloud.ok = true; cloud.reqSeen = null;
+    cloud.subs.push(api.onSnapshot(api.query(api.collection(F, 'friends'), api.where('users', 'array-contains', u.fbUid)), onFriendsSnap, e => console.warn(e)));
+    cloud.subs.push(api.onSnapshot(api.query(api.collection(F, 'chats'), api.where('members', 'array-contains', u.fbUid)), onChatsSnap, e => console.warn(e)));
+    save(); cloudRefresh();
+  } catch (e) { cloudErr(e); }
+  finally { cloud.starting = false; }
+}
+function cloudStop(purge) {
+  cloud.subs.forEach(f => f()); cloud.subs = [];
+  cloud.msgSubs.forEach(f => f()); cloud.msgSubs.clear();
+  cloud.ensuring.clear(); cloud.ok = false; cloud.uid = null; cloud.claimed = null;
+  peopleQuery = ''; peopleFound = { q: '', ids: [], busy: false };
+  if (purge && db) {                                    // чужие переписки не остаются на устройстве после выхода
+    const ids = new Set(db.chats.filter(c => c.cloudId).map(c => c.id));
+    db.chats = db.chats.filter(c => !c.cloudId); db.messages = db.messages.filter(m => !ids.has(m.chat)); db.friends = db.friends.filter(f => !f.cloud);
+    save();
+  }
+}
+// изменения из базы приходят сами; страницу перерисовываем, только если человек сейчас ничего не набирает
+function cloudRefresh() {
+  clearTimeout(cloud.rt);
+  cloud.rt = setTimeout(() => {
+    if (route.name !== 'chat' && route.name !== 'profile') return renderNav();
+    const a = document.activeElement;
+    const typing = a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName) && !['chatInput', 'peopleFind', 'chatSearch'].includes(a.id);
+    if (route.params.modal || typing || !document.getElementById('authModal').hidden) { renderNav(); cloud.rt = setTimeout(cloudRefresh, 1500); return; }
+    render({ soft: true });
+  }, 80);
+}
+function onFriendsSnap(snap) {
+  const list = [], mine = me() && me().id;
+  snap.forEach(d => {
+    const x = d.data();
+    if (!Array.isArray(x.users) || x.users.length !== 2 || !x.users.includes(cloud.uid) || typeof x.from !== 'string') return;
+    list.push({ a: localOf(x.users[0]), b: localOf(x.users[1]), from: localOf(x.from), status: x.status === 'accepted' ? 'accepted' : 'pending', at: +x.at || 0, cloud: d.id });
+  });
+  const incoming = list.filter(f => f.status === 'pending' && f.from !== mine);
+  if (cloud.reqSeen) incoming.filter(f => !cloud.reqSeen.has(f.cloud)).forEach(f => toast(`Новая заявка в друзья: ${(userById(f.from) || {}).name || ''}`));
+  cloud.reqSeen = new Set(incoming.map(f => f.cloud));
+  db.friends = db.friends.filter(f => !f.cloud).concat(list);
+  save(); cloudRefresh();
+}
+function localChat(cid) {
+  let c = db.chats.find(x => x.cloudId === cid);
+  if (!c) { c = { id: nextId('chats'), cloudId: cid, type: 'direct', members: [], createdAt: Date.now() }; db.chats.push(c); }
+  return c;
+}
+function onChatsSnap(snap) {
+  const seen = new Set();
+  snap.forEach(d => {
+    const x = d.data();
+    if (!Array.isArray(x.members) || !x.members.includes(cloud.uid)) return;
+    seen.add(d.id);
+    const c = localChat(d.id);
+    c.type = x.type === 'group' ? 'group' : 'direct';
+    c.members = [...new Set(x.members.filter(m => typeof m === 'string').slice(0, 100))].map(localOf);
+    if (c.type === 'group') {
+      c.name = (typeof x.name === 'string' && cleanText(x.name).trim().slice(0, 60)) || 'Группа';
+      c.emoji = typeof x.emoji === 'string' && GROUP_EMOJI.includes(x.emoji) ? x.emoji : '👥';
+      c.color = Number.isInteger(x.color) ? Math.abs(x.color) % PALS.length : 0;
+    }
+    c.owner = typeof x.owner === 'string' ? localOf(x.owner) : null;
+    c.createdAt = +x.createdAt || c.createdAt;
+    delete c.pending;
+    if (!cloud.msgSubs.has(d.id)) listenMsgs(d.id);
+  });
+  // чаты, из которых человек вышел или где его удалили
+  db.chats.filter(c => c.cloudId && !c.pending && !seen.has(c.cloudId)).forEach(c => {
+    const f = cloud.msgSubs.get(c.cloudId); if (f) { f(); cloud.msgSubs.delete(c.cloudId); }
+    db.chats = db.chats.filter(x => x !== c); db.messages = db.messages.filter(m => m.chat !== c.id);
+  });
+  save(); cloudRefresh();
+}
+function listenMsgs(cid) {
+  const api = cloud.api;
+  let first = true;
+  const q = api.query(api.collection(cloud.fs, 'chats', cid, 'messages'), api.orderBy('at', 'desc'), api.limit(200));
+  cloud.msgSubs.set(cid, api.onSnapshot(q, s => {
+    const c = db.chats.find(x => x.cloudId === cid); if (!c) return;
+    const old = new Map(db.messages.filter(m => m.chat === c.id && m.cloudId).map(m => [m.cloudId, m])), list = [];
+    s.forEach(d => {
+      const x = d.data();
+      if (typeof x.from !== 'string' || typeof x.text !== 'string') return;
+      const prev = old.get(d.id);
+      list.push({ id: prev ? prev.id : nextId('messages'), cloudId: d.id, chat: c.id, from: localOf(x.from), text: cleanText(x.text).slice(0, 2000), at: +x.at || 0,
+        readBy: Array.isArray(x.readBy) ? x.readBy.filter(r => typeof r === 'string').map(localOf) : [], ...(x.system ? { system: true } : {}) });
+    });
+    const mine = me() && me().id, open = route.name === 'chat' && route.params.c === c.id;
+    if (!first && !open) list.filter(m => !old.has(m.cloudId) && !m.system && m.from !== mine).slice(0, 1)
+      .forEach(m => toast(`Новое сообщение от ${(userById(m.from) || {}).name || ''}`));
+    first = false;
+    db.messages = db.messages.filter(m => m.chat !== c.id).concat(list);
+    save(); cloudRefresh();
+  }, e => console.warn(e)));
+}
+// ---- запись в общую базу
+const pairKey = (a, b) => [a, b].sort().join('_');
+function cloudFriend(kind, other) {
+  const api = cloud.api, o = userById(other), u = me();
+  if (!o || !o.fbUid) return toast('Этот участник есть только на этом устройстве.');
+  const ref = api.doc(cloud.fs, 'friends', pairKey(cloud.uid, o.fbUid)), f = friendOf(u.id, other), fail = e => cloudErr(e, true);
+  if (kind === 'add' && !f) { api.setDoc(ref, { users: [cloud.uid, o.fbUid].sort(), from: cloud.uid, status: 'pending', at: Date.now() }).catch(fail); toast(`Заявка отправлена: ${o.name}`); }
+  else if ((kind === 'add' || kind === 'accept') && f && f.status === 'pending' && f.from !== u.id) { api.updateDoc(ref, { status: 'accepted', at: Date.now() }).catch(fail); toast(`Теперь вы друзья: ${o.name}`); }
+  else if (['decline', 'remove', 'cancel'].includes(kind) && f) api.deleteDoc(ref).catch(fail);
+}
+function cloudDirect(o) {
+  const ids = [cloud.uid, o.fbUid].sort(), cid = 'd_' + ids.join('_');
+  let c = db.chats.find(x => x.cloudId === cid);
+  if (!c) { c = localChat(cid); Object.assign(c, { type: 'direct', members: [me().id, o.id], pending: true, createdAt: Date.now() }); }
+  if (!cloud.ensuring.has(cid)) {
+    const api = cloud.api, ref = api.doc(cloud.fs, 'chats', cid);
+    cloud.ensuring.set(cid, api.getDoc(ref).then(s => s.exists() ? null : api.setDoc(ref, { type: 'direct', members: ids, owner: cloud.uid, createdAt: Date.now() }))
+      .catch(e => { cloud.ensuring.delete(cid); throw e; }));
+  }
+  return c;
+}
+async function cloudSend(c, text, system) {
+  const api = cloud.api;
+  if (cloud.ensuring.has(c.cloudId)) await cloud.ensuring.get(c.cloudId);
+  await api.addDoc(api.collection(cloud.fs, 'chats', c.cloudId, 'messages'), { from: cloud.uid, text, at: Date.now(), readBy: [], ...(system ? { system: true } : {}) });
+}
+function cloudGroup(name, emoji, memberIds) {
+  const api = cloud.api, uids = [...new Set([cloud.uid, ...memberIds.map(id => (userById(id) || {}).fbUid).filter(Boolean)])];
+  const ref = api.doc(api.collection(cloud.fs, 'chats'));
+  const c = localChat(ref.id);
+  Object.assign(c, { type: 'group', name, emoji, color: hash(name) % PALS.length, members: uids.map(localOf), owner: me().id, createdAt: Date.now(), pending: true });
+  cloud.ensuring.set(ref.id, api.setDoc(ref, { type: 'group', name, emoji, color: c.color, members: uids, owner: cloud.uid, createdAt: c.createdAt }));
+  cloudSend(c, `${me().name} создал(а) группу «${name}»`, true).catch(e => cloudErr(e, true));
+  return c;
+}
+// участники группы: c.members — местные номера, в базу пишем uid
+function cloudMembers(c, members, extra) {
+  const api = cloud.api, uids = members.map(id => (userById(id) || {}).fbUid).filter(Boolean);
+  return api.updateDoc(api.doc(cloud.fs, 'chats', c.cloudId), { members: uids, ...(extra || {}) });
+}
+function cloudMarkRead(c) {
+  const api = cloud.api, mine = me().id;
+  const todo = db.messages.filter(m => m.chat === c.id && m.cloudId && !m.system && m.from !== mine && !(m.readBy || []).includes(mine) && !cloud.reading.has(m.cloudId)).slice(0, 400);
+  if (!todo.length) return;
+  const b = api.writeBatch(cloud.fs);
+  todo.forEach(m => { cloud.reading.add(m.cloudId); b.update(api.doc(cloud.fs, 'chats', c.cloudId, 'messages', m.cloudId), { readBy: api.arrayUnion(cloud.uid) }); });
+  b.commit().catch(e => console.warn(e)).finally(() => todo.forEach(m => cloud.reading.delete(m.cloudId)));
+}
+// поиск людей по юзернейму (по началу: «mad» найдёт @madina)
+let peopleQuery = '', peopleFound = { q: '', ids: [], busy: false };
+function cloudFind(value) {
+  peopleQuery = value;
+  const n = cleanUsername(value).replace(/[^a-z0-9_.]/g, '');
+  clearTimeout(cloud.ft);
+  if (n.length < 2) { peopleFound = { q: n, ids: [], busy: false }; return paintFound(); }
+  peopleFound = { q: n, ids: peopleFound.q === n ? peopleFound.ids : [], busy: true }; paintFound();
+  cloud.ft = setTimeout(async () => {
+    try {
+      const api = cloud.api, s = await api.getDocs(api.query(api.collection(cloud.fs, 'users'), api.where('username', '>=', n), api.where('username', '<=', n + ''), api.limit(12)));
+      const ids = [];
+      s.forEach(d => { if (d.id === cloud.uid) return; const id = localOf(d.id); applyProfile(userById(id), d.data()); ids.push(id); });
+      if (cleanUsername(peopleQuery).replace(/[^a-z0-9_.]/g, '') !== n) return;
+      peopleFound = { q: n, ids, busy: false }; save();
+    } catch (e) { peopleFound = { q: n, ids: [], busy: false }; cloudErr(e, true); }
+    paintFound();
+  }, 300);
+}
+// результаты поиска рисуются на месте, не трогая поле ввода
+function paintFound() {
+  const box = document.getElementById('peopleFound');
+  if (box && route.name === 'chat' && route.params.tab === 'friends') { box.innerHTML = foundHTML(); if (settings.lang !== 'ru') translateTree(box); }
+}
+// строки людей в друзьях, поиске и группах
+function personRowHTML(p, actions) {
+  return `<div class="fr-row" data-name="${esc(norm(`${p.name} ${p.username || ''}`))}">${avatar(p)}<span class="cl-txt"><b>${esc(p.name)}</b><small>${p.username ? `<span class="uname">@${esc(p.username)}</span> · ` : ''}${esc(p.position || ROLE[p.role] || '')}</small></span><span class="row">${actions}</span></div>`;
+}
+function friendBtnsHTML(p) {
+  const st = friendState(me().id, p.id);
+  return st === 'friends' ? `<a class="btn small" data-go="chat" data-with="${p.id}" href="#">Написать</a>`
+    : st === 'sent' ? `<button class="btn ghost small" type="button" data-friend="cancel" data-uid="${p.id}">Отменить заявку</button>`
+    : st === 'received' ? `<button class="btn small" type="button" data-friend="accept" data-uid="${p.id}">Принять</button>`
+    : `<button class="btn ghost small" type="button" data-friend="add" data-uid="${p.id}">＋ В друзья</button>`;
+}
+function foundHTML() {
+  if (peopleFound.q.length < 2) return '<p class="muted small fr-empty">Введите юзернейм друга, например @madina — он есть в профиле у каждого.</p>';
+  if (peopleFound.busy && !peopleFound.ids.length) return '<p class="muted small fr-empty">Ищем…</p>';
+  return peopleFound.ids.map(userById).filter(p => p && p.id !== me().id).map(p => personRowHTML(p, friendBtnsHTML(p))).join('') || '<p class="muted small fr-empty">Никого не нашли.</p>';
+}
+// поле «Юзернейм»: подсказка и проверка, свободен ли
+function checkUsernameField(inp, exceptId) {
+  const hint = document.getElementById(inp.dataset.hint), n = cleanUsername(inp.value);
+  if (!hint) return;
+  const set = (txt, cls) => { hint.textContent = txt; hint.className = 'un-hint ' + cls; if (settings.lang !== 'ru') translateTree(hint); };
+  const p = usernameProblem(n);
+  if (p) return set(p, 'err');
+  if (me() && me().username === n && (!FB_AUTH || cloud.claimed === n || !cloudOn())) return set('✓ Это ваш юзернейм', 'ok');
+  set('Проверяем…', '');
+  clearTimeout(inp._t);
+  inp._t = setTimeout(async () => {
+    const free = await usernameFree(n, exceptId);
+    if (cleanUsername(inp.value) === n) set(free ? '✓ Свободен' : '✕ Уже занят', free ? 'ok' : 'err');
+  }, 350);
+}
 
 // ------------------------------------------------------------------ мессенджер: личные чаты, группы и друзья (как WhatsApp / Telegram)
 function migrateV4() {             // старая версия: оставлена, чтобы новые базы проходили те же шаги
@@ -3019,6 +3382,7 @@ const chatMsgs = id => db.messages.filter(m => m.chat === id);
 const lastMsg = id => chatMsgs(id).reduce((a, m) => !a || m.at > a.at ? m : a, null);
 const unreadIn = (c, uid) => db.messages.filter(m => m.chat === c.id && !m.system && m.from !== uid && !(m.readBy || []).includes(uid)).length;
 function markRead(c, uid) {
+  if (c.cloudId) { if (cloudOn()) cloudMarkRead(c); return; }          // общий чат: отметка «прочитано» уходит в базу
   let changed = false;
   db.messages.forEach(m => { if (m.chat === c.id && m.from !== uid) { m.readBy = m.readBy || []; if (!m.readBy.includes(uid)) { m.readBy.push(uid); changed = true; } } });
   if (changed) save();
@@ -3031,6 +3395,7 @@ function friendState(a, b) { const f = friendOf(a, b); return !f ? 'none' : f.st
 function friendAction(kind, other) {
   const u = me();
   if (!u || !userById(other) || other === u.id) return;
+  if (cloudOn()) return cloudFriend(kind, other);
   const f = friendOf(u.id, other), o = userById(other);
   if (kind === 'add') {
     if (!f) { db.friends.push({ a: u.id, b: other, from: u.id, status: 'pending', at: Date.now() }); toast(`Заявка отправлена: ${o.name}`); }
@@ -3331,7 +3696,7 @@ const views = {
       <div class="ig-top">
         <span class="ig-ring big">${avatar(user, 'huge')}</span>
         <div class="ig-info">
-          <div class="ig-name"><h1>${esc(user.name)}</h1>
+          <div class="ig-name"><h1>${esc(user.name)}</h1>${user.username ? `<span class="ig-uname">@${esc(user.username)}</span>` : ''}
             ${mine ? `<a class="btn ghost small" data-go="editProfile" href="#">Редактировать профиль</a><button class="icon-btn sm" type="button" id="settingsOpen2" aria-label="Настройки" title="Настройки">⚙</button>`
               : me() ? `<a class="btn small" data-go="chat" data-with="${user.id}" href="#">💬 Написать сообщение</a>${{ none: `<button class="btn ghost small" type="button" data-friend="add" data-uid="${user.id}">＋ Добавить в друзья</button>`, sent: `<button class="btn ghost small" type="button" data-friend="cancel" data-uid="${user.id}">Заявка отправлена ✕</button>`, received: `<button class="btn ghost small" type="button" data-friend="accept" data-uid="${user.id}">Принять заявку</button>`, friends: '<span class="badge role-student">✓ Друзья</span>' }[friendState(me().id, user.id)]}` : ''}</div>
           <div class="ig-stats">
@@ -3365,7 +3730,11 @@ const views = {
     const u = me(), wide = window.innerWidth > 760;
     if (params.with != null) {
       const other = userById(+params.with);
-      if (other && other.id !== u.id) { const dc = directChat(u.id, other.id, true); params.c = dc.id; save(); }
+      if (other && other.id !== u.id) {
+        if (cloudOn() && other.fbUid) params.c = cloudDirect(other).id;          // общий чат в базе
+        else { const dc = directChat(u.id, other.id, true); params.c = dc.id; }
+        save();
+      }
       delete params.with;
     }
     const tab = params.tab || 'all';
@@ -3377,7 +3746,8 @@ const views = {
     if (!cur && wide && tab !== 'friends' && !params.modal) cur = all[0] || null;
     if (cur) { params.c = cur.id; markRead(cur, u.id); }
     const reqs = incomingReqs(u.id), friends = friendsOf(u.id).map(userById).filter(Boolean);
-    const others = db.users.filter(x => x.id !== u.id);
+    // в общей базе люди находятся по юзернейму, поэтому в списках — друзья; без базы — все аккаунты устройства
+    const others = cloudOn() ? friends : db.users.filter(x => x.id !== u.id && !x.remote);
 
     const item = c => {
       const m = lastMsg(c.id), n = unreadIn(c, u.id), au = m && userById(m.from);
@@ -3388,20 +3758,18 @@ const views = {
         <span class="cl-txt"><b>${esc(chatTitle(c, u.id))}</b><small>${tick}${m ? esc(prefix + m.text.slice(0, 60)) : c.type === 'group' ? `${c.members.length} участников` : 'Начните переписку'}</small></span>
         <span class="cl-meta">${m ? `<time>${timeLabel(m.at)}</time>` : ''}${n ? `<span class="unread">${n}</span>` : ''}</span></a>`;
     };
-    const personRow = (p, actions) => `<div class="fr-row" data-name="${esc(norm(p.name))}">${avatar(p)}<span class="cl-txt"><b>${esc(p.name)}</b><small>${esc(p.position || ROLE[p.role] || '')}</small></span><span class="row">${actions}</span></div>`;
-    const friendBtns = p => { const st = friendState(u.id, p.id);
-      return st === 'friends' ? `<a class="btn small" data-go="chat" data-with="${p.id}" href="#">Написать</a>`
-        : st === 'sent' ? `<button class="btn ghost small" type="button" data-friend="cancel" data-uid="${p.id}">Отменить заявку</button>`
-        : st === 'received' ? `<button class="btn small" type="button" data-friend="accept" data-uid="${p.id}">Принять</button>`
-        : `<button class="btn ghost small" type="button" data-friend="add" data-uid="${p.id}">＋ В друзья</button>`; };
+    const personRow = personRowHTML, friendBtns = friendBtnsHTML;
 
     const leftBody = tab === 'friends' ? `<div class="fr-panel">
         ${reqs.length ? `<p class="fr-h">Заявки в друзья · ${reqs.length}</p>${reqs.map(f => { const p = userById(f.from); return p ? personRow(p, `<button class="btn small" type="button" data-friend="accept" data-uid="${p.id}">Принять</button><button class="btn ghost small" type="button" data-friend="decline" data-uid="${p.id}">Отклонить</button>`) : ''; }).join('')}` : ''}
         <p class="fr-h">Мои друзья · ${friends.length}</p>
         ${friends.map(p => personRow(p, `<a class="btn small" data-go="chat" data-with="${p.id}" href="#">Написать</a><button class="link" type="button" data-friend="remove" data-uid="${p.id}" title="Удалить из друзей">✕</button>`)).join('') || '<p class="muted small fr-empty">Пока нет друзей. Найдите людей ниже.</p>'}
-        <p class="fr-h">Найти людей</p>
-        <input id="peopleFind" placeholder="Имя или кафедра…" aria-label="Найти людей" autocomplete="off">
-        <div id="peopleFound">${others.filter(p => !['friends', 'received'].includes(friendState(u.id, p.id))).map(p => personRow(p, friendBtns(p))).join('') || '<p class="muted small fr-empty">Все участники уже у вас в друзьях.</p>'}</div>
+        ${cloudOn() ? `<p class="fr-h">Найти по юзернейму</p>
+        <input id="peopleFind" value="${esc(peopleQuery)}" placeholder="@юзернейм" aria-label="Найти по юзернейму" autocomplete="off" autocapitalize="none" spellcheck="false">
+        <div id="peopleFound">${foundHTML()}</div>`
+        : `<p class="fr-h">Найти людей</p>
+        <input id="peopleFind" placeholder="@юзернейм или имя…" aria-label="Найти людей" autocomplete="off" autocapitalize="none" spellcheck="false">
+        <div id="peopleFound">${others.filter(p => !['friends', 'received'].includes(friendState(u.id, p.id))).map(p => personRow(p, friendBtns(p))).join('') || '<p class="muted small fr-empty">Все участники уже у вас в друзьях.</p>'}</div>`}
       </div>`
       : `<div class="cl-items">${listed.map(item).join('') || `<div class="cl-empty"><p class="muted">${tab === 'group' ? 'Групп пока нет.' : 'Чатов пока нет.'}</p>
           <button class="btn small" type="button" data-modal="${tab === 'group' ? 'newgroup' : 'newdm'}">${tab === 'group' ? '👥 Создать группу' : '✉️ Новое сообщение'}</button></div>`}</div>`;
@@ -3439,11 +3807,11 @@ const views = {
           <a class="icon-btn sm back" data-go="chat" data-c="0" href="#" aria-label="Назад к списку">←</a>
           ${isGroup ? `<button type="button" class="cp-who as-btn" id="grpInfoBtn">${chatAvatar(cur, u.id)}<span><b>${esc(cur.name)}</b><small class="muted">${esc(cur.members.map(id => (userById(id) || {}).name).filter(Boolean).map(n => String(n).split(' ')[0]).join(', '))}</small></span></button>
               <button class="icon-btn sm" type="button" id="grpInfoBtn2" aria-label="О группе" title="О группе">ⓘ</button>`
-            : `<a data-go="profile" data-id="${other.id}" href="#" class="cp-who">${chatAvatar(cur, u.id)}<span><b>${esc(other.name)}</b><small class="muted">${esc(other.position || ROLE[other.role] || '')}</small></span></a>
+            : `<a data-go="profile" data-id="${other.id}" href="#" class="cp-who">${chatAvatar(cur, u.id)}<span><b>${esc(other.name)}</b><small class="muted">${other.username ? `<span class="uname">@${esc(other.username)}</span> · ` : ''}${esc(other.position || ROLE[other.role] || '')}</small></span></a>
               ${friendState(u.id, other.id) === 'none' ? `<button class="btn ghost small" type="button" data-friend="add" data-uid="${other.id}">＋ В друзья</button>` : ''}`}
         </header>
         <div class="cp-body">
-          <div class="cp-msgs" id="cpMsgs">${bubbles || `<p class="muted cp-start">${isGroup ? 'Напишите первое сообщение в группе.' : 'Начните разговор — напишите первое сообщение.'}</p>`}</div>
+          <div class="cp-msgs" id="cpMsgs" data-c="${cur.id}">${bubbles || `<p class="muted cp-start">${isGroup ? 'Напишите первое сообщение в группе.' : 'Начните разговор — напишите первое сообщение.'}</p>`}</div>
           ${info}
         </div>
         <div class="emoji-pop" id="emojiPop" hidden>${CHAT_EMOJI.map(e => `<button type="button" data-emoji="${e}">${e}</button>`).join('')}</div>
@@ -3457,7 +3825,8 @@ const views = {
         <input id="modalFind" placeholder="Кому написать…" aria-label="Кому написать" autocomplete="off">
         <div class="modal-list">
           ${friends.length ? `<p class="fr-h">Друзья</p>${friends.map(p => `<a class="nc-item" data-go="chat" data-with="${p.id}" href="#" data-name="${esc(norm(p.name))}">${avatar(p)}<span>${esc(p.name)}</span></a>`).join('')}` : ''}
-          <p class="fr-h">Все участники</p>${others.filter(p => !friends.includes(p)).map(p => `<a class="nc-item" data-go="chat" data-with="${p.id}" href="#" data-name="${esc(norm(p.name))}">${avatar(p)}<span>${esc(p.name)}</span></a>`).join('')}
+          ${others.some(p => !friends.includes(p)) ? `<p class="fr-h">Все участники</p>${others.filter(p => !friends.includes(p)).map(p => `<a class="nc-item" data-go="chat" data-with="${p.id}" href="#" data-name="${esc(norm(`${p.name} ${p.username || ''}`))}">${avatar(p)}<span>${esc(p.name)}</span></a>`).join('')}` : ''}
+          ${cloudOn() ? '<p class="muted small fr-empty">Чтобы написать новому человеку, найдите его по юзернейму во вкладке «Друзья».</p>' : ''}
         </div></div></div>`
       : params.modal === 'newgroup' ? `<div class="modal-back" data-close-modal><div class="modal panel pop" role="dialog" aria-modal="true" aria-label="Создать группу">
         <div class="cl-head"><h2>Новая группа</h2><button class="icon-btn sm" type="button" data-close-modal aria-label="Закрыть">✕</button></div>
@@ -3506,6 +3875,8 @@ const views = {
         <div class="kinds two" role="radiogroup" aria-label="Роль">
           ${Object.entries(ROLE).map(([k, v]) => `<label class="kind"><input type="radio" name="profRole" value="${k}" ${(u.role || 'student') === k ? 'checked' : ''}><b>${v}</b><span>${k === 'teacher' ? 'Публикую свои работы' : 'Читаю и пишу отзывы'}</span></label>`).join('')}
         </div>
+        <label>Юзернейм<span class="un-wrap"><span class="un-at" aria-hidden="true">@</span><input id="profUser" data-hint="profUserHint" value="${esc(u.username || suggestUsername(u.email ? u.email.split('@')[0] : u.name))}" maxlength="20" required autocomplete="nickname" autocapitalize="none" spellcheck="false"></span></label>
+        <small class="un-hint" id="profUserHint">По юзернейму вас находят друзья. Латинские буквы, цифры, «_» и «.».</small>
         <div class="grid2 even"><label>Имя и фамилия<input id="profName" value="${esc(u.name)}" maxlength="80" required></label>
           <label>Должность<input id="profPos" value="${esc(u.position || '')}" maxlength="80" placeholder="доцент, ст. преподаватель, студент 2 курса"></label></div>
         <div class="grid2 even"><label>Университет<input id="profUni" value="${esc(u.university || '')}" maxlength="120"></label>
@@ -3786,6 +4157,13 @@ function render({ soft = false, anchor } = {}) {
       app.innerHTML = views.oops(); document.getElementById('explainBtn').hidden = true; window.scrollTo(0, 0);
       return;
     }
+    // что человек набирал и где читал переписку — сохраняем при перерисовке
+    const ae = document.activeElement, keep = soft && ae && app.contains(ae) && ae.id && /^(INPUT|TEXTAREA)$/.test(ae.tagName) && !/checkbox|radio|file/.test(ae.type)
+      ? { id: ae.id, v: ae.value, s: ae.selectionStart, e: ae.selectionEnd } : null;
+    const box0 = document.getElementById('cpMsgs'), draft0 = document.getElementById('chatInput');
+    const sameChat = soft && box0 && route.name === 'chat' && +box0.dataset.c === route.params.c;
+    const stick = !sameChat || box0.scrollHeight - box0.scrollTop - box0.clientHeight < 90, top0 = box0 ? box0.scrollTop : 0, draft = sameChat && draft0 ? draft0.value : '';
+    const searches = soft ? ['chatSearch', 'modalFind'].map(id => [id, (document.getElementById(id) || {}).value || '']) : [];
     app.innerHTML = html;
     if (route.name === 'landing') bindLanding();
     document.getElementById('explainBtn').hidden = true;
@@ -3794,9 +4172,13 @@ function render({ soft = false, anchor } = {}) {
     if (route.name === 'write') (route.params.mode === 'bulk' ? bindBulk : bindWrite)();
     if (route.name === 'check' && pending && !pending.started) { pending.started = true; runCheck(pending); }
     if (route.name === 'chat') {
-      const box = document.getElementById('cpMsgs'); if (box) box.scrollTop = box.scrollHeight;
-      const ci = document.getElementById('chatInput'); if (ci && window.innerWidth > 760) ci.focus();
+      const box = document.getElementById('cpMsgs'); if (box) box.scrollTop = stick ? box.scrollHeight : top0;
+      const ci = document.getElementById('chatInput');
+      if (ci && draft) { ci.value = draft; ci.style.height = Math.min(140, ci.scrollHeight) + 'px'; }
+      if (ci && window.innerWidth > 760 && !keep) ci.focus();
+      for (const [id, v] of searches) { const el = document.getElementById(id); if (el && v) { el.value = v; el.dispatchEvent(new Event('input', { bubbles: true })); } }
     }
+    if (keep) { const el = document.getElementById(keep.id); if (el) { if (el.value !== keep.v && el.id !== 'peopleFind') el.value = keep.v; el.focus({ preventScroll: true }); try { el.setSelectionRange(keep.s, keep.e); } catch (e) {} } }
     if (!soft) {
       animateCounts(app);
       const el = anchor && document.getElementById(anchor);
@@ -4212,7 +4594,7 @@ document.addEventListener('click', e => {
     return go(a.dataset.go, p);
   }
   const id = e.target.closest('[id]') && e.target.closest('[id]').id;
-  if (id === 'logout') { e.preventDefault(); session = { userId: null, signedOut: true }; save(); fbSignOut(); toast('Вы вышли из аккаунта.'); return go('home'); }
+  if (id === 'logout') { e.preventDefault(); cloudStop(true); session = { userId: null, signedOut: true }; save(); fbSignOut(); toast('Вы вышли из аккаунта.'); return go('home'); }
   if (id === 'roomOpen' || id === 'roomBack') {
     const on = id === 'roomOpen';
     if (on && !settings.scene) setSetting('scene', true);      // кнопка 🕯 всегда включает комнату
@@ -4257,14 +4639,22 @@ document.addEventListener('click', e => {
     const am = e.target.closest('[data-addmember]');
     if (am && c && c.members.includes(u.id)) {
       const p = userById(+am.dataset.addmember);
-      if (p && !c.members.includes(p.id)) { c.members.push(p.id); sys(`${u.name} добавил(а) ${p.name}`); save(); }
+      if (p && !c.members.includes(p.id) && c.cloudId) { if (cloudOn() && p.fbUid) cloudMembers(c, [...c.members, p.id]).then(() => cloudSend(c, `${u.name} добавил(а) ${p.name}`, true)).catch(err => cloudErr(err, true)); }
+      else if (p && !c.members.includes(p.id)) { c.members.push(p.id); sys(`${u.name} добавил(а) ${p.name}`); save(); }
       return render({ soft: true });
     }
     const kk = e.target.closest('[data-kick]');
     if (kk && c && c.owner === u.id) {
       const p = userById(+kk.dataset.kick);
-      if (p && p.id !== u.id && c.members.includes(p.id)) { c.members = c.members.filter(x => x !== p.id); sys(`${u.name} удалил(а) ${p.name}`); save(); }
+      if (p && p.id !== u.id && c.members.includes(p.id) && c.cloudId) { if (cloudOn()) cloudMembers(c, c.members.filter(x => x !== p.id)).then(() => cloudSend(c, `${u.name} удалил(а) ${p.name}`, true)).catch(err => cloudErr(err, true)); }
+      else if (p && p.id !== u.id && c.members.includes(p.id)) { c.members = c.members.filter(x => x !== p.id); sys(`${u.name} удалил(а) ${p.name}`); save(); }
       return render({ soft: true });
+    }
+    if (id === 'grpLeave' && c && c.members.includes(u.id) && c.cloudId) {
+      if (!cloudOn()) return toast('Нет связи с общей базой. Попробуйте чуть позже.');
+      const rest = c.members.filter(x => x !== u.id), heir = c.owner === u.id && rest.length && userById(rest[0]);
+      cloudSend(c, `${u.name} покинул(а) группу`, true).then(() => cloudMembers(c, rest, heir && heir.fbUid ? { owner: heir.fbUid } : {})).catch(err => cloudErr(err, true));
+      route.params = { tab: 'group' }; toast('Вы покинули группу.'); return render({ soft: true });
     }
     if (id === 'grpLeave' && c && c.members.includes(u.id)) {
       c.members = c.members.filter(x => x !== u.id); sys(`${u.name} покинул(а) группу`);
@@ -4382,6 +4772,15 @@ app.addEventListener('submit', async e => {
   if (id === 'profileForm') {
     const u = me();
     const val = id => cleanText(document.getElementById(id).value).trim();
+    const un = cleanUsername(document.getElementById('profUser').value);
+    if (un !== u.username || (cloudOn() && cloud.claimed !== un)) {
+      const up = usernameProblem(un); if (up) return toast(up);
+      if (cloudOn()) {
+        try { await cloudClaim(u, un); }
+        catch (err) { return toast(err && err.code === 'permission-denied' ? `Юзернейм @${un} уже занят.` : 'Не удалось сохранить юзернейм.'); }
+      } else if (localUsernameTaken(un, u.id)) return toast(`Юзернейм @${un} уже занят.`);
+      u.username = un;
+    }
     u.name = val('profName').slice(0, 80) || u.name;
     u.position = val('profPos').slice(0, 80); u.university = val('profUni').slice(0, 120); u.faculty = val('profFac').slice(0, 120);
     u.bio = val('profBio').slice(0, 1000);
@@ -4390,6 +4789,7 @@ app.addEventListener('submit', async e => {
     if (editAvatar === null && u.photo) { delete u.photo; u.photoOff = true; }   // фото из Google тоже убираем
     u.banner = editBanner;
     if (session.via === 'fb' && fb.auth && fb.auth.currentUser) fb.api.updateProfile(fb.auth.currentUser, { displayName: u.name }).catch(() => {});
+    if (cloudOn()) cloud.api.setDoc(cloud.api.doc(cloud.fs, 'users', u.fbUid), profileOut(u)).catch(err => cloudErr(err, true));   // профиль виден на всех устройствах
     save(); toast('Профиль сохранён.'); return go('profile', { id: u.id });
   }
   if (id === 'bulkForm') return runBulk();
@@ -4426,6 +4826,10 @@ app.addEventListener('submit', async e => {
   if (id === 'groupForm') return createGroup();
   if (id === 'grpRename') {
     const c = chatById(route.params.c), u = me(), n = cleanText(document.getElementById('grpName').value).trim().slice(0, 60);
+    if (c && n && c.owner === u.id && n !== c.name && c.cloudId) {
+      if (cloudOn()) cloud.api.updateDoc(cloud.api.doc(cloud.fs, 'chats', c.cloudId), { name: n }).then(() => cloudSend(c, `${u.name} переименовал(а) группу в «${n}»`, true)).catch(err => cloudErr(err, true));
+      return render({ soft: true });
+    }
     if (c && n && c.owner === u.id && n !== c.name) { c.name = n; db.messages.push({ id: nextId('messages'), chat: c.id, from: u.id, system: true, text: `${u.name} переименовал(а) группу в «${n}»`, at: Date.now(), readBy: [] }); save(); }
     return render({ soft: true });
   }
@@ -4470,8 +4874,15 @@ function sendChat() {
   if (Date.now() - (chatGate.get(u.id) || 0) < 800) return toast('Не так быстро — подождите секунду.');
   if ((text.match(/https?:\/\/|www\./gi) || []).length > 3) return toast('В сообщении слишком много ссылок.');
   chatGate.set(u.id, Date.now());
+  if (c.cloudId) {
+    if (!cloudOn()) return toast('Нет связи с общей базой. Попробуйте чуть позже.');
+    ta.value = ''; ta.style.height = '';
+    cloudSend(c, text).catch(e => { cloudErr(e, true); if (!ta.value) ta.value = text; });
+    return;
+  }
   const m = { id: nextId('messages'), chat: c.id, from: u.id, text, at: Date.now(), readBy: [] };
   db.messages.push(m); lastSentId = m.id;
+  ta.value = '';
   save();
   render({ soft: true });
   lastSentId = 0;
@@ -4482,6 +4893,7 @@ function createGroup() {
   if (!name) return toast('Введите название группы.');
   if (!members.length) return toast('Выберите хотя бы одного участника.');
   const emoji = (document.querySelector('input[name="gEmoji"]:checked') || {}).value || '👥';
+  if (cloudOn()) { const gc = cloudGroup(name, emoji, members); toast(`Группа «${name}» создана.`); route.params = { c: gc.id }; return render({ soft: true }); }
   const c = { id: nextId('chats'), type: 'group', name, emoji, color: hash(name) % PALS.length, members: [u.id, ...members], owner: u.id, createdAt: Date.now() };
   db.chats.push(c);
   db.messages.push({ id: nextId('messages'), chat: c.id, from: u.id, system: true, text: `${u.name} создал(а) группу «${name}»`, at: Date.now(), readBy: [] });
@@ -4493,10 +4905,12 @@ app.addEventListener('keydown', e => {
 });
 app.addEventListener('input', e => {
   if (e.target.id === 'chatInput') { e.target.style.height = 'auto'; e.target.style.height = Math.min(140, e.target.scrollHeight) + 'px'; }
+  if (e.target.id === 'peopleFind' && cloudOn()) return cloudFind(e.target.value);
   const flt = { chatSearch: '.cl-item', peopleFind: '#peopleFound .fr-row', modalFind: '.modal-list [data-name]' }[e.target.id];
   if (flt) { const q = norm(e.target.value); document.querySelectorAll(flt).forEach(x => { x.hidden = q && !x.dataset.name.includes(q); }); }
 });
 app.addEventListener('input', e => { if (e.target.id === 'regPassword') updateStrength(e.target, document.getElementById('regMeter')); });
+app.addEventListener('input', e => { if (e.target.id === 'profUser') checkUsernameField(e.target, me() && me().id); });
 // ------------------------------------------------------------------ живые детали: глубина комнаты, свет за курсором, наклон обложек, искры
 // Только оформление: ни одна функция сайта от этого не зависит. При «уменьшить движение» почти всё выключено
 (() => {
