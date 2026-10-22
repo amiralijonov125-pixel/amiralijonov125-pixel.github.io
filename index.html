@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-T+YPk+AsD7t/h+rF3tmjCkT4lJBBCW1qldxNv9f88PI=' 'sha256-kPawE+mkFlyXM3n9KI8zHquJ5jQcjpiaNfdWfdZEH0Q=' 'sha256-9KlGBtqwsNGeTYmR4oDTNUU8tPMIQmwsRtH0ESN0GBk=' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://www.gstatic.com https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://*.googleusercontent.com; connect-src 'self' https://*.googleapis.com https://apis.google.com; media-src 'self' blob: data:; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src https://*.firebaseapp.com https://*.web.app https://accounts.google.com https://apis.google.com; manifest-src 'self'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-T+YPk+AsD7t/h+rF3tmjCkT4lJBBCW1qldxNv9f88PI=' 'sha256-WcR3QbibH0SntLmNNhTH2mN+ESU0oWreEiMwOWZ5HtE=' 'sha256-9KlGBtqwsNGeTYmR4oDTNUU8tPMIQmwsRtH0ESN0GBk=' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://www.gstatic.com https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob: https://*.googleusercontent.com; connect-src 'self' https://*.googleapis.com https://apis.google.com; media-src 'self' blob: data:; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src https://*.firebaseapp.com https://*.web.app https://accounts.google.com https://apis.google.com; manifest-src 'self'; upgrade-insecure-requests">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="description" content="Китобхона — университетская онлайн-библиотека: книги, эссе и стихи преподавателей с проверкой оригинальности и ИИ-помощником.">
 <meta name="theme-color" content="#0d0907">
@@ -2355,7 +2355,10 @@ const I18N = {
   'Я автор этого текста или он свободен от авторских прав.': ['Ман муаллифи ин матн ҳастам ё он аз ҳуқуқи муаллиф озод аст.', 'I wrote this text or it is free of copyright.'],
   'Проверить и опубликовать': ['Санҷидан ва нашр кардан', 'Check and publish'], 'Перед публикацией текст проверяется на оригинальность.': ['Пеш аз нашр асолати матн санҷида мешавад.', 'Before publishing, the text is checked for originality.'],
   'Перед публикацией текст проверяется на оригинальность. Черновик сохраняется сам.': ['Пеш аз нашр асолати матн санҷида мешавад. Нусхаи хомӯш худкор нигоҳ дошта мешавад.', 'Before publishing, the text is checked for originality. Your draft saves automatically.'],
-  'Файл (PDF или TXT, до 20 МБ)': ['Файл (PDF ё TXT, то 20 МБ)', 'File (PDF or TXT, up to 20 MB)'],
+  'Файл (PDF или TXT, до 500 МБ)': ['Файл (PDF ё TXT, то 500 МБ)', 'File (PDF or TXT, up to 500 MB)'],
+  'Файл слишком большой (максимум 500 МБ).': ['Файл хеле калон аст (ҳадди аксар 500 МБ).', 'The file is too large (500 MB max).'],
+  'В книге слишком много текста (больше 20 млн символов). Разделите её на части.': ['Дар китоб матн хеле зиёд аст (зиёда аз 20 млн аломат). Онро ба қисмҳо тақсим кунед.', 'The book has too much text (over 20 million characters). Split it into parts.'],
+  'Читаю файл…': ['Файл хонда мешавад…', 'Reading the file…'], 'Не удалось прочитать файл.': ['Файлро хондан нашуд.', 'Could not read the file.'],
   'Перед публикацией': ['Пеш аз нашр', 'Before publishing'], 'Проверка оригинальности': ['Санҷиши асолат', 'Originality check'], '← Изменить текст': ['← Тағйир додани матн', '← Edit text'],
   'Сравнение с библиотекой': ['Муқоиса бо китобхона', 'Comparison with the library'], 'Ищем такие же фразы во всех произведениях Китобхоны': ['Ибораҳои якхеларо дар ҳамаи асарҳои Китобхона меҷӯем', 'Looking for identical phrases in every work on Kitobkhona'],
   'Строки классиков': ['Сатрҳои классикон', 'Lines of the classics'], 'Рудаки, Фирдавси, Хайём, Саади, Хафиз, Руми': ['Рӯдакӣ, Фирдавсӣ, Хайём, Саъдӣ, Ҳофиз, Румӣ', 'Rudaki, Ferdowsi, Khayyam, Saadi, Hafez, Rumi'],
@@ -2552,7 +2555,7 @@ const I18N_RE = [
   [/^Вся библиотека · (.+)$/, 'Ҳамаи китобҳо · $1', 'Whole library · $1'], [/^Таджикская библиотека · (.+) произведений$/, 'Китобхонаи тоҷикӣ · $1 асар', 'Tajik library · $1 works'],
   [/^Стр\. (\d+) из (\d+)$/, 'Саҳ. $1 аз $2', 'Page $1 of $2'], [/^Комментарии \((\d+)\)$/, 'Шарҳҳо ($1)', 'Comments ($1)'], [/^(\d+) произв\.$/, '$1 асар', '$1 works'],
   [/^страниц: (\d+)$/, 'саҳифа: $1', 'pages: $1'], [/^(\d+) в каталоге$/, '$1 дар феҳрист', '$1 in catalogue'], [/^только в каталоге$/, 'танҳо дар феҳрист', 'catalogue only'],
-  [/^Опубликовано: «(.+)»$/, 'Нашр шуд: «$1»', 'Published: “$1”'], [/^Салом, (.+)!$/, 'Салом, $1!', 'Hello, $1!'], [/^Неверная почта или пароль\. Осталось попыток: (\d+)\.$/, 'Почта ё парол нодуруст аст. Кӯшишҳои боқимонда: $1.', 'Wrong email or password. Attempts left: $1.'], [/^Добро пожаловать, (.+)! Расскажите немного о себе\.$/, 'Хуш омадед, $1! Каме дар бораи худ нависед.', 'Welcome, $1! Tell us a little about yourself.'],
+  [/^Опубликовано: «(.+)»$/, 'Нашр шуд: «$1»', 'Published: “$1”'], [/^Салом, (.+)!$/, 'Салом, $1!', 'Hello, $1!'], [/^Читаю файл… (\d+) из (\d+) стр\.$/, 'Файл хонда мешавад… $1 аз $2 саҳ.', 'Reading the file… page $1 of $2'], [/^Неверная почта или пароль\. Осталось попыток: (\d+)\.$/, 'Почта ё парол нодуруст аст. Кӯшишҳои боқимонда: $1.', 'Wrong email or password. Attempts left: $1.'], [/^Добро пожаловать, (.+)! Расскажите немного о себе\.$/, 'Хуш омадед, $1! Каме дар бораи худ нависед.', 'Welcome, $1! Tell us a little about yourself.'],
   [/^Искать «(.+)» везде →$/, '«$1»-ро дар ҳама ҷо ҷустан →', 'Search “$1” everywhere →'], [/^Открыть на сайте (.+) ↗$/, 'Кушодан дар сайти $1 ↗', 'Open on $1 ↗'],
   [/^В Китобхоне найдено: (.+)\.$/, 'Дар Китобхона ёфт шуд: $1.', 'Found on Kitobkhona: $1.'],
   [/^✓ Проверено на оригинальность · (\d+)%$/, '✓ Асолат санҷида шуд · $1%', '✓ Originality checked · $1%'], [/^⚠ Проверено, есть совпадения · (\d+)%$/, '⚠ Санҷида шуд, мувофиқат ҳаст · $1%', '⚠ Checked, matches found · $1%'],
@@ -3581,7 +3584,7 @@ const views = {
         ${mode === 'text'
           ? `<label>Текст<textarea id="wText" class="paper-input" placeholder="${esc(ph)}">${esc(d.text || '')}</textarea></label>
              <p class="muted small" id="wCount"></p>`
-          : `<label>Файл (PDF или TXT, до 20 МБ)<input type="file" id="wFile" accept=".pdf,.txt" required></label>`}
+          : `<label>Файл (PDF или TXT, до 500 МБ)<input type="file" id="wFile" accept=".pdf,.txt" required></label>`}
         <label class="check"><input type="checkbox" id="wRights"> Я автор этого текста или он свободен от авторских прав.</label>
         <div class="row"><button class="btn" type="submit" id="wSubmit">Проверить и опубликовать</button>
           <span class="muted small">Перед публикацией текст проверяется на оригинальность.${mode === 'text' ? ' Черновик сохраняется сам.' : ''}</span></div>
@@ -4031,7 +4034,9 @@ async function loadPdfJs() {
   }
   throw new Error('pdf.js unavailable');
 }
-async function extractPages(file) {
+// большие книги (сканы с картинками) весят сотни мегабайт: ограничение 500 МБ на файл
+const MAX_FILE = 500 * 1024 * 1024, MAX_BOOK_CHARS = 20000000;
+async function extractPages(file, onProgress) {
   const ext = file.name.split('.').pop().toLowerCase();
   if (ext === 'txt') {
     const text = await file.text();
@@ -4041,10 +4046,14 @@ async function extractPages(file) {
   if (!window.pdfjsLib) await loadPdfJs();
   const pdf = await window.pdfjsLib.getDocument({ data: new Uint8Array(await file.arrayBuffer()), isEvalSupported: false, enableXfa: false }).promise;
   const pages = [];
-  for (let i = 1; i <= pdf.numPages; i++) {
-    const tc = await (await pdf.getPage(i)).getTextContent();
-    pages.push(tc.items.map(it => it.str + (it.hasEOL ? '\n' : ' ')).join(''));
-  }
+  try {
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const page = await pdf.getPage(i), tc = await page.getTextContent();
+      pages.push(tc.items.map(it => it.str + (it.hasEOL ? '\n' : ' ')).join(''));
+      page.cleanup();                                   // освобождаем память страницы: важно для больших файлов
+      if (onProgress && (i % 5 === 0 || i === pdf.numPages)) { onProgress(i, pdf.numPages); await new Promise(r => setTimeout(r)); }
+    }
+  } finally { pdf.destroy(); }
   return pages;
 }
 
@@ -4112,7 +4121,8 @@ async function runBulk() {
     if (existing.has(bookKey(r.title, r.author))) continue;           // повтор внутри самой таблицы
     let text = r.text;
     const f = r.file && files.get(r.file.toLowerCase());
-    if (!text && f && f.size <= 20 * 1024 * 1024) { try { text = await f.text(); } catch (e) {} }
+    if (!text && f && f.size <= MAX_FILE) { try { text = await f.text(); } catch (e) {} }
+    if (text && text.length > MAX_BOOK_CHARS) text = '';                // слишком большой текст — книга добавится без текста
     const pages = text && text.trim() ? paginate(text) : [];
     addWork(uid, { title: r.title, author: r.author || 'Автор неизвестен', year: r.year, genre: r.genre, url: r.url,
       description: r.description, language: r.lang, kind: r.kind, pages });
@@ -4394,10 +4404,13 @@ app.addEventListener('submit', async e => {
       if (!file) return toast('Выберите файл.');
       const ext = file.name.split('.').pop().toLowerCase();
       if (!['pdf', 'txt'].includes(ext)) return toast('Можно загружать только PDF или TXT.');
-      if (file.size > 20 * 1024 * 1024) return toast('Файл слишком большой (максимум 20 МБ).');
+      if (file.size > MAX_FILE) return toast('Файл слишком большой (максимум 500 МБ).');
       const btn = document.getElementById('wSubmit'); btn.disabled = true; btn.textContent = 'Читаю файл…';
-      try { pages = await extractPages(file); }
-      catch (err) { btn.disabled = false; btn.textContent = 'Проверить и опубликовать'; return toast('Не удалось прочитать файл.'); }
+      const back = () => { btn.disabled = false; btn.textContent = 'Проверить и опубликовать'; };
+      try { pages = await extractPages(file, (i, n) => { btn.textContent = `Читаю файл… ${i} из ${n} стр.`; }); }
+      catch (err) { back(); return toast('Не удалось прочитать файл.'); }
+      // очень большой текст повесил бы проверку оригинальности и поиск — такую книгу лучше разделить
+      if (pages.reduce((s, x) => s + x.length, 0) > MAX_BOOK_CHARS) { back(); return toast('В книге слишком много текста (больше 20 млн символов). Разделите её на части.'); }
       if (!pages.some(p => p.trim())) toast('В файле не найден текст. Если это скан, сначала нужно распознать текст (OCR).');
     } else {
       const text = (d.text || '').trim();
